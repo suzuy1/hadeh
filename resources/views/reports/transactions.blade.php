@@ -67,7 +67,7 @@
                                         {{ $transaction->tanggal }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $transaction->item->nama_barang ?? 'N/A' }} ({{ $transaction->item->kode_inventaris ?? 'N/A' }}) - {{ $transaction->item->jenisBarang->nama_jenis ?? 'N/A' }}
+                                        {{ $transaction->item->nama_barang ?? 'N/A' }} ({{ $transaction->item->kode_inventaris ?? 'N/A' }}) - {{ $transaction->item->kategori ?? 'N/A' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         {{ $transaction->jenis }}

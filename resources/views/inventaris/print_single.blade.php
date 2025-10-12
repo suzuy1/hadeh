@@ -31,7 +31,7 @@
     <div class="item-details">
         <p><strong>Kode Inventaris:</strong> {{ $inventaris->kode_inventaris }}</p>
         <p><strong>Nama Barang:</strong> {{ $inventaris->nama_barang }}</p>
-        <p><strong>Jenis Barang:</strong> {{ $inventaris->jenisBarang->nama_jenis ?? 'N/A' }} ({{ $inventaris->jenisBarang->tipe ?? 'N/A' }})</p>
+        <p><strong>Jenis Barang:</strong> {{ $inventaris->kategori ?? 'N/A' }}</p>
         <p><strong>Kategori Inventaris:</strong> {{ $inventaris->kategori }}</p>
         <p><strong>Pemilik:</strong> {{ $inventaris->pemilik }}</p>
         <p><strong>Sumber Dana:</strong> {{ $inventaris->sumber_dana }}</p>
@@ -41,8 +41,8 @@
         <p><strong>Lokasi:</strong> {{ $inventaris->lokasi ?? 'N/A' }}</p>
         <p><strong>Ruangan:</strong> {{ $inventaris->room->nama_ruangan ?? 'N/A' }}</p>
         <p><strong>Unit Kerja/Fakultas:</strong> {{ $inventaris->unit->nama_unit ?? 'N/A' }}</p>
-        @if ($inventaris->jenisBarang && $inventaris->jenisBarang->tipe === 'habis_pakai')
-            <p><strong>Stok Saat Ini:</strong> {{ $inventaris->stokHabisPakai->sum('sisa_stok') }}</p>
+        @if ($inventaris->kategori === 'habis_pakai')
+            <p><strong>Stok Saat Ini:</strong> {{ $inventaris->stokHabisPakai->sum('jumlah_masuk') - $inventaris->stokHabisPakai->sum('jumlah_keluar') }}</p>
         @endif
         <p><strong>Dibuat Pada:</strong> {{ $inventaris->created_at }}</p>
         <p><strong>Terakhir Diperbarui Pada:</strong> {{ $inventaris->updated_at }}</p>

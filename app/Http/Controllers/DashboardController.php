@@ -20,12 +20,14 @@ class DashboardController extends Controller
         
         // Fetch low stock items, considering habis_pakai items
         $lowStockItems = Inventaris::where('kategori', 'habis_pakai')
-        ->join('stok_habis_pakais', 'inventaris.id', '=', 'stok_habis_pakais.id_inventaris')
-        ->select('inventaris.*', \DB::raw('SUM(stok_habis_pakais.sisa_stok) as total_sisa_stok'))
-        ->groupBy('inventaris.id')
-        ->havingRaw('SUM(stok_habis_pakais.sisa_stok) < 10') // Example: stock less than 10
-        ->orderByRaw('SUM(stok_habis_pakais.sisa_stok) asc')
-        ->get();
+            ->with('stokHabisPakai') // Eager load relasi
+            ->get()
+            ->map(function ($item) {
+                $item->total_sisa_stok = $item->stokHabisPakai->sum('jumlah_masuk') - $item->stokHabisPakai->sum('jumlah_keluar');
+                return $item;
+            })
+            ->where('total_sisa_stok', '<', 10) // Filter after calculation
+            ->sortBy('total_sisa_stok');
 
         $recentTransactions = Transaction::with(['item', 'user'])->orderBy('created_at', 'desc')->take(5)->get();
 

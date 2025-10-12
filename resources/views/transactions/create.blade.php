@@ -13,7 +13,7 @@
                 updateStockInfo() {
                     const selectedItem = this.inventarisData.find(item => item.id == this.selectedInventarisId);
                     if (selectedItem) {
-                        this.itemType = selectedItem.jenis_barang.tipe;
+                        this.itemType = selectedItem.kategori;
                         if (this.itemType === 'habis_pakai') {
                             // Fetch current stock for consumable item
                             fetch(`/api/inventaris/${selectedItem.id}/stock`)
@@ -42,7 +42,7 @@
                         <option value="">Pilih Inventaris</option>
                         @foreach ($inventaris as $item)
                             <option value="{{ $item->id }}" {{ old('item_id') == $item->id ? 'selected' : '' }}>
-                                {{ $item->nama_barang }} ({{ $item->kode_inventaris }}) - {{ $item->jenisBarang->nama_jenis ?? 'N/A' }}
+                                {{ $item->nama_barang }} ({{ $item->kode_inventaris }}) - {{ $item->kategori ?? 'N/A' }}
                             </option>
                         @endforeach
                     </select>

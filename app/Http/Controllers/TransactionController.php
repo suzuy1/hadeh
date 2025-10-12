@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Transaction;
 use App\Models\Inventaris; // Changed from Item
 use App\Models\User;
-use App\Models\JenisBarang; // New import
 use App\Models\StokHabisPakai; // New import
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +17,7 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        $transactions = Transaction::with(['item.jenisBarang', 'user'])->get(); // Eager load jenisBarang
+        $transactions = Transaction::with('user')->get();
         return view('transactions.index', compact('transactions'));
     }
 
@@ -27,9 +26,9 @@ class TransactionController extends Controller
      */
     public function create()
     {
-        $inventaris = Inventaris::with('jenisBarang')->get(); // Get all inventaris with their jenis
+        $inventaris = Inventaris::all();
         $users = User::all();
-        return view('transactions.create', compact('inventaris', 'users')); // Changed variable name
+        return view('transactions.create', compact('inventaris', 'users'));
     }
 
     /**
@@ -38,7 +37,7 @@ class TransactionController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'item_id' => 'required|exists:inventaris,id', // Changed table name
+            'item_id' => 'required|exists:inventaris,id',
             'jenis' => 'required|in:penggunaan,peminjaman,pengembalian,mutasi',
             'jumlah' => 'required|integer|min:1',
             'tanggal' => 'required|date',
@@ -46,26 +45,23 @@ class TransactionController extends Controller
             'keterangan' => 'nullable|string|max:255',
         ]);
 
-        $inventaris = Inventaris::with('jenisBarang')->findOrFail($validatedData['item_id']);
+        $inventaris = Inventaris::findOrFail($validatedData['item_id']);
 
         DB::transaction(function () use ($validatedData, $inventaris) {
-            if ($inventaris->jenisBarang->tipe === 'habis_pakai') {
+            if ($inventaris->kategori === 'habis_pakai') {
                 // For consumable items, update stok_habis_pakai
                 if ($validatedData['jenis'] === 'penggunaan' || $validatedData['jenis'] === 'peminjaman') {
-                    $currentStock = StokHabisPakai::where('id_inventaris', $inventaris->id)->sum('sisa_stok');
+                    $currentStock = StokHabisPakai::where('id_inventaris', $inventaris->id)->sum(DB::raw('jumlah_masuk - jumlah_keluar'));
                     if ($currentStock < $validatedData['jumlah']) {
                         throw new \Exception('Stok barang habis pakai tidak mencukupi.');
                     }
-                    // Deduct from stock, prioritizing older batches if needed (complex, simplified here)
                     StokHabisPakai::create([
                         'id_inventaris' => $inventaris->id,
-                        'jumlah_masuk' => 0, // No new stock coming in
+                        'jumlah_masuk' => 0,
                         'jumlah_keluar' => $validatedData['jumlah'],
                         'tanggal' => $validatedData['tanggal'],
                     ]);
                 } elseif ($validatedData['jenis'] === 'pengembalian') {
-                    // For pengembalian of consumable, it implies returning unused portion or adding back
-                    // This might be less common for 'penggunaan' but possible for 'peminjaman'
                     StokHabisPakai::create([
                         'id_inventaris' => $inventaris->id,
                         'jumlah_masuk' => $validatedData['jumlah'],
@@ -75,10 +71,6 @@ class TransactionController extends Controller
                 }
             } else {
                 // For non-consumable items, stock is not managed by quantity in stok_habis_pakai
-                // 'Peminjaman' and 'Pengembalian' would imply status changes or assignment, not quantity.
-                // 'Mutasi' would imply location change.
-                // The current logic doesn't directly affect 'stok' on Inventaris, as it no longer exists.
-                // Further logic would be needed here for non-consumable specific actions.
             }
 
             Transaction::create($validatedData);
@@ -94,7 +86,7 @@ class TransactionController extends Controller
      */
     public function show(Transaction $transaction)
     {
-        $transaction->load(['item.jenisBarang', 'user']); // Eager load jenisBarang
+        $transaction->load('user');
         return view('transactions.show', compact('transaction'));
     }
 
@@ -105,10 +97,9 @@ class TransactionController extends Controller
     {
         DB::transaction(function () use ($transaction) {
             $inventaris = $transaction->item;
-            if ($inventaris && $inventaris->jenisBarang->tipe === 'habis_pakai') {
+            if ($inventaris && $inventaris->kategori === 'habis_pakai') {
                 // Revert stock changes for consumable items
                 if ($transaction->jenis === 'penggunaan' || $transaction->jenis === 'peminjaman') {
-                    // Revert deduction by adding back to stock
                     StokHabisPakai::create([
                         'id_inventaris' => $inventaris->id,
                         'jumlah_masuk' => $transaction->jumlah,
@@ -117,7 +108,6 @@ class TransactionController extends Controller
                         'keterangan' => 'Revert from deleted transaction: ' . $transaction->id,
                     ]);
                 } elseif ($transaction->jenis === 'pengembalian') {
-                    // Revert addition by deducting from stock
                     StokHabisPakai::create([
                         'id_inventaris' => $inventaris->id,
                         'jumlah_masuk' => 0,

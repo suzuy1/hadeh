@@ -54,7 +54,11 @@
                                 <td class="py-2 px-4 border-b border-gray-200">{{ $item->pemilik ?? 'N/A' }}</td>
                                 <td class="py-2 px-4 border-b border-gray-200">{{ \Carbon\Carbon::parse($item->tahun_beli)->format('d-m-Y') ?? 'N/A' }}</td>
                                 <td class="py-2 px-4 border-b border-gray-200">
-                                    -
+                                    @if ($item->kategori === 'habis_pakai')
+                                        {{ $item->stokHabisPakai->sum('jumlah_masuk') - $item->stokHabisPakai->sum('jumlah_keluar') }}
+                                    @else
+                                        -
+                                    @endif
                                 </td>
                                 <td class="py-2 px-4 border-b border-gray-200">
                                     <a href="{{ route('inventaris.show', $item) }}" class="text-blue-600 hover:text-blue-900 mr-2">Lihat</a>

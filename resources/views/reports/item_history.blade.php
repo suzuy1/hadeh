@@ -11,7 +11,7 @@
                     <select name="item_id" id="item_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                         <option value="">Semua Inventaris</option>
                         @foreach ($items as $item)
-                            <option value="{{ $item->id }}" {{ request('item_id') == $item->id ? 'selected' : '' }}>{{ $item->nama_barang }} ({{ $item->kode_inventaris }}) - {{ $item->jenisBarang->nama_jenis ?? 'N/A' }}</option>
+                            <option value="{{ $item->id }}" {{ request('item_id') == $item->id ? 'selected' : '' }}>{{ $item->nama_barang }} ({{ $item->kode_inventaris }}) - {{ $item->kategori ?? 'N/A' }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -66,7 +66,7 @@
                                         {{ $transaction->tanggal }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                        {{ $transaction->item->nama_barang ?? 'N/A' }} ({{ $transaction->item->kode_inventaris ?? 'N/A' }}) - {{ $transaction->item->jenisBarang->nama_jenis ?? 'N/A' }}
+                                        {{ $transaction->item->nama_barang ?? 'N/A' }} ({{ $transaction->item->kode_inventaris ?? 'N/A' }}) - {{ $transaction->item->kategori ?? 'N/A' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                         {{ $transaction->jenis }}

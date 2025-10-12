@@ -10,7 +10,7 @@ class ReportController extends Controller
 {
     public function transactionReport(Request $request)
     {
-        $query = Transaction::with(['item.jenisBarang', 'user']); // Eager load jenisBarang
+        $query = Transaction::with(['item', 'user']);
 
         if ($request->filled('start_date')) {
             $query->whereDate('tanggal', '>=', $request->start_date);
@@ -31,7 +31,7 @@ class ReportController extends Controller
 
     public function itemHistoryReport(Request $request)
     {
-        $query = Transaction::with(['item.jenisBarang', 'user']); // Eager load jenisBarang
+        $query = Transaction::with(['item', 'user']);
 
         if ($request->filled('item_id')) {
             $query->where('item_id', $request->item_id);

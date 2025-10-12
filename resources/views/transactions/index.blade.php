@@ -33,7 +33,7 @@
                     @forelse ($transactions as $transaction)
                         <tr>
                             <td class="py-2 px-4 border-b border-gray-200">{{ $transaction->id }}</td>
-                            <td class="py-2 px-4 border-b border-gray-200">{{ $transaction->item->nama_barang ?? 'N/A' }} ({{ $transaction->item->kode_inventaris ?? 'N/A' }}) - {{ $transaction->item->jenisBarang->nama_jenis ?? 'N/A' }}</td>
+                            <td class="py-2 px-4 border-b border-gray-200">{{ $transaction->item->nama_barang ?? 'N/A' }} ({{ $transaction->item->kode_inventaris ?? 'N/A' }}) - {{ $transaction->item->kategori ?? 'N/A' }}</td>
                             <td class="py-2 px-4 border-b border-gray-200">{{ $transaction->jenis }}</td>
                             <td class="py-2 px-4 border-b border-gray-200">{{ $transaction->jumlah }}</td>
                             <td class="py-2 px-4 border-b border-gray-200">{{ $transaction->tanggal }}</td>

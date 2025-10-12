@@ -11,7 +11,7 @@
 
                 <div class="mb-4">
                     <label for="item_name" class="block text-gray-700 text-sm font-bold mb-2">Inventaris:</label>
-                    <input type="text" id="item_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value="{{ $request->item->nama_barang ?? 'N/A' }} ({{ $request->item->kode_inventaris ?? 'N/A' }}) - {{ $request->item->jenisBarang->nama_jenis ?? 'N/A' }}" disabled>
+                    <input type="text" id="item_name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value="{{ $request->item->nama_barang ?? 'N/A' }} ({{ $request->item->kode_inventaris ?? 'N/A' }}) - {{ $request->item->kategori ?? 'N/A' }}" disabled>
                 </div>
 
                 <div class="mb-4">

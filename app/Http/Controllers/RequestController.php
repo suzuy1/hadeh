@@ -6,7 +6,6 @@ use App\Models\Request as ItemRequest; // Alias Request model to avoid conflict 
 use App\Models\Inventaris; // Changed from Item
 use App\Models\User;
 use App\Models\Transaction;
-use App\Models\JenisBarang; // New import
 use App\Models\StokHabisPakai; // New import
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +18,7 @@ class RequestController extends Controller
      */
     public function index()
     {
-        $requests = ItemRequest::with(['item.jenisBarang', 'requester', 'approver'])->get(); // Eager load jenisBarang
+        $requests = ItemRequest::with(['item', 'requester', 'approver'])->get();
         return view('requests.index', compact('requests'));
     }
 
@@ -28,8 +27,8 @@ class RequestController extends Controller
      */
     public function create()
     {
-        $inventaris = Inventaris::with('jenisBarang')->get(); // Get all inventaris with their jenis
-        return view('requests.create', compact('inventaris')); // Changed variable name
+        $inventaris = Inventaris::all();
+        return view('requests.create', compact('inventaris'));
     }
 
     /**
@@ -38,20 +37,19 @@ class RequestController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'item_id' => 'required|exists:inventaris,id', // Changed table name
+            'item_id' => 'required|exists:inventaris,id',
             'jumlah' => 'required|integer|min:1',
             'tanggal_request' => 'required|date',
         ]);
 
-        $inventaris = Inventaris::with('jenisBarang')->findOrFail($validatedData['item_id']);
+        $inventaris = Inventaris::findOrFail($validatedData['item_id']);
 
-        if ($inventaris->jenisBarang->tipe === 'habis_pakai') {
-            $currentStock = StokHabisPakai::where('id_inventaris', $inventaris->id)->sum('sisa_stok');
+        if ($inventaris->kategori === 'habis_pakai') {
+            $currentStock = StokHabisPakai::where('id_inventaris', $inventaris->id)->sum(DB::raw('jumlah_masuk - jumlah_keluar'));
             if ($currentStock < $validatedData['jumlah']) {
                 return back()->withErrors(['jumlah' => 'Stok barang habis pakai tidak mencukupi untuk permintaan ini.'])->withInput();
             }
         }
-        // For non-consumable items, stock is not managed by quantity, so no stock check here.
 
         ItemRequest::create([
             'item_id' => $validatedData['item_id'],
@@ -70,7 +68,7 @@ class RequestController extends Controller
      */
     public function show(ItemRequest $request)
     {
-        $request->load(['item.jenisBarang', 'requester', 'approver']); // Eager load jenisBarang
+        $request->load(['item', 'requester', 'approver']);
         return view('requests.show', compact('request'));
     }
 
@@ -80,7 +78,7 @@ class RequestController extends Controller
     public function edit(ItemRequest $request)
     {
         $users = User::all();
-        $inventaris = Inventaris::with('jenisBarang')->get(); // For selecting the item if needed, though not directly used in current edit view
+        $inventaris = Inventaris::all();
         return view('requests.edit', compact('request', 'users', 'inventaris'));
     }
 
@@ -94,7 +92,7 @@ class RequestController extends Controller
             'approver_id' => 'nullable|exists:users,id',
         ]);
 
-        $inventaris = $requestModel->item; // Get the associated inventaris item
+        $inventaris = $requestModel->item;
 
         DB::transaction(function () use ($validatedData, $requestModel, $inventaris) {
             $requestModel->update([
@@ -103,8 +101,8 @@ class RequestController extends Controller
             ]);
 
             if ($validatedData['status'] === 'disetujui') {
-                if ($inventaris->jenisBarang->tipe === 'habis_pakai') {
-                    $currentStock = StokHabisPakai::where('id_inventaris', $inventaris->id)->sum('sisa_stok');
+                if ($inventaris->kategori === 'habis_pakai') {
+                    $currentStock = StokHabisPakai::where('id_inventaris', $inventaris->id)->sum(DB::raw('jumlah_masuk - jumlah_keluar'));
                     if ($currentStock < $requestModel->jumlah) {
                         throw new \Exception('Stok barang habis pakai tidak mencukupi untuk menyetujui permintaan ini.');
                     }
@@ -119,7 +117,7 @@ class RequestController extends Controller
 
                 Transaction::create([
                     'item_id' => $requestModel->item_id,
-                    'jenis' => 'penggunaan', // Assuming approved requests are for 'penggunaan'
+                    'jenis' => 'penggunaan',
                     'jumlah' => $requestModel->jumlah,
                     'tanggal' => now()->toDateString(),
                     'user_id' => $requestModel->requester_id,

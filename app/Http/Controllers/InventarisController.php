@@ -8,8 +8,8 @@ use App\Models\Room;
 use App\Models\Unit;
 use App\Models\StokHabisPakai; // New import
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ItemsExport; // Will need to be updated
-use App\Imports\ItemsImport; // Will need to be updated
+use App\Exports\InventarisExport;
+use App\Imports\InventarisImport;
 
 class InventarisController extends Controller // Changed class name
 {
@@ -143,8 +143,7 @@ class InventarisController extends Controller // Changed class name
      */
     public function export()
     {
-        // return Excel::download(new ItemsExport, 'items.xlsx'); // Needs update for Inventaris
-        return redirect()->route('inventaris.index')->with('info', 'Export functionality needs to be updated for new schema.');
+        return Excel::download(new InventarisExport, 'inventaris.xlsx');
     }
 
     /**
@@ -152,11 +151,11 @@ class InventarisController extends Controller // Changed class name
      */
     public function import(Request $request)
     {
-        // $request->validate([
-        //     'file' => 'required|mimes:xlsx,xls,csv',
-        // ]);
-        // Excel::import(new ItemsImport, $request->file('file')); // Needs update for Inventaris
-        return redirect()->route('inventaris.index')->with('info', 'Import functionality needs to be updated for new schema.');
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+        ]);
+        Excel::import(new InventarisImport, $request->file('file'));
+        return redirect()->route('inventaris.index')->with('success', 'Inventaris imported successfully!');
     }
 
     /**
@@ -182,8 +181,10 @@ class InventarisController extends Controller // Changed class name
      */
     public function getStock(Inventaris $inventaris)
     {
-        // Since jenisBarang is removed, this functionality needs to be re-evaluated or removed.
-        // For now, returning 'Tidak Berlaku' as stock is tied to 'habis_pakai' type.
+        if ($inventaris->kategori === 'habis_pakai') {
+            $currentStock = StokHabisPakai::where('id_inventaris', $inventaris->id)->sum(DB::raw('jumlah_masuk - jumlah_keluar'));
+            return response()->json(['sisa_stok' => $currentStock]);
+        }
         return response()->json(['sisa_stok' => 'Tidak Berlaku']);
     }
 }

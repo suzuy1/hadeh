@@ -11,7 +11,7 @@
             </div>
             <div class="mb-4">
                 <p class="text-gray-700 text-sm font-bold">Inventaris:</p>
-                <p class="text-gray-900">{{ $request->item->nama_barang ?? 'N/A' }} ({{ $request->item->kode_inventaris ?? 'N/A' }}) - {{ $request->item->jenisBarang->nama_jenis ?? 'N/A' }}</p>
+                <p class="text-gray-900">{{ $request->item->nama_barang ?? 'N/A' }} ({{ $request->item->kode_inventaris ?? 'N/A' }}) - {{ $request->item->kategori ?? 'N/A' }}</p>
             </div>
             <div class="mb-4">
                 <p class="text-gray-700 text-sm font-bold">Jumlah:</p>

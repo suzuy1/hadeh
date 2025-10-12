@@ -50,14 +50,14 @@
                 <tr>
                     <td>{{ $item->kode_inventaris }}</td>
                     <td>{{ $item->nama_barang }}</td>
-                    <td>{{ $item->jenisBarang->nama_jenis ?? 'N/A' }} ({{ $item->jenisBarang->tipe ?? 'N/A' }})</td>
+                    <td>{{ $item->kategori ?? 'N/A' }}</td>
                     <td>{{ $item->kondisi ?? 'N/A' }}</td>
                     <td>{{ $item->lokasi ?? 'N/A' }}</td>
                     <td>{{ $item->pemilik ?? 'N/A' }}</td>
                     <td>{{ $item->tahun_beli ?? 'N/A' }}</td>
                     <td>
-                        @if ($item->jenisBarang && $item->jenisBarang->tipe === 'habis_pakai')
-                            {{ $item->stokHabisPakai->sum('sisa_stok') }}
+                        @if ($item->kategori === 'habis_pakai')
+                            {{ $item->stokHabisPakai->sum('jumlah_masuk') - $item->stokHabisPakai->sum('jumlah_keluar') }}
                         @else
                             -
                         @endif
