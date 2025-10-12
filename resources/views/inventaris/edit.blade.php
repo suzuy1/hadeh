@@ -44,7 +44,7 @@
 
                 <div class="mb-4">
                     <label for="tahun_beli" class="block text-gray-700 text-sm font-bold mb-2">Tahun Beli:</label>
-                    <input type="date" name="tahun_beli" id="tahun_beli" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('tahun_beli') border-red-500 @enderror" value="{{ old('tahun_beli', $inventaris->tahun_beli) }}" required>
+                    <input type="date" name="tahun_beli" id="tahun_beli" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('tahun_beli') border-red-500 @enderror" value="{{ old('tahun_beli', \Carbon\Carbon::parse($inventaris->tahun_beli)->format('Y-m-d')) }}" required>
                     @error('tahun_beli')
                         <p class="text-red-500 text-xs italic">{{ $message }}</p>
                     @enderror

@@ -18,7 +18,7 @@ class InventarisController extends Controller // Changed class name
      */
     public function index(Request $request)
     {
-        $query = Inventaris::with(['room', 'unit']); // Eager load new relationships
+        $query = Inventaris::with(['room', 'unit', 'stokHabisPakai']); // Eager load new relationships
 
         $inventaris = $query->get(); // Changed variable name
         return view('inventaris.index', compact('inventaris')); // Changed view name and variable

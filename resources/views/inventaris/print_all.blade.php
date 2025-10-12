@@ -37,7 +37,7 @@
             <tr>
                 <th>Kode Inventaris</th>
                 <th>Nama Barang</th>
-                <th>Jenis Barang</th>
+                <th>Kategori</th>
                 <th>Kondisi</th>
                 <th>Lokasi</th>
                 <th>Pemilik</th>
