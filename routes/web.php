@@ -18,7 +18,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    Route::resource('inventaris', InventarisController::class);
+    Route::resource('inventaris', InventarisController::class)->parameters([
+        'inventaris' => 'inventaris'
+    ]);
     Route::resource('acquisitions', AcquisitionController::class);
     Route::resource('rooms', RoomController::class);
     Route::resource('users', UserController::class);

@@ -23,6 +23,8 @@ class Inventaris extends Model
         'nama_barang',
         'kondisi',
         'lokasi',
+        'unit_id',
+        'room_id',
     ];
 
     // Relationships

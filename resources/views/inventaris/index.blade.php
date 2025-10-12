@@ -36,11 +36,16 @@
                         <tr>
                             <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kode Inventaris</th>
                             <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama Barang</th>
+                            <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kategori</th>
+                            <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Pemilik</th>
+                            <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Sumber Dana</th>
+                            <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tahun Beli</th>
+                            <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nomor Unit</th>
                             <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kondisi</th>
                             <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Lokasi</th>
-                            <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Pemilik</th>
-                            <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tanggal & Tahun Beli</th>
-                            <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stok (HP)</th>
+                            <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Unit</th>
+                            <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ruangan</th>
+                            <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Stok (Habis Pakai)</th>
                             <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
@@ -49,10 +54,15 @@
                             <tr>
                                 <td class="py-2 px-4 border-b border-gray-200">{{ $item->kode_inventaris }}</td>
                                 <td class="py-2 px-4 border-b border-gray-200">{{ $item->nama_barang }}</td>
+                                <td class="py-2 px-4 border-b border-gray-200">{{ $item->kategori }}</td>
+                                <td class="py-2 px-4 border-b border-gray-200">{{ $item->pemilik ?? 'N/A' }}</td>
+                                <td class="py-2 px-4 border-b border-gray-200">{{ $item->sumber_dana ?? 'N/A' }}</td>
+                                <td class="py-2 px-4 border-b border-gray-200">{{ \Carbon\Carbon::parse($item->tahun_beli)->format('d-m-Y') ?? 'N/A' }}</td>
+                                <td class="py-2 px-4 border-b border-gray-200">{{ $item->nomor_unit ?? 'N/A' }}</td>
                                 <td class="py-2 px-4 border-b border-gray-200">{{ $item->kondisi ?? 'N/A' }}</td>
                                 <td class="py-2 px-4 border-b border-gray-200">{{ $item->lokasi ?? 'N/A' }}</td>
-                                <td class="py-2 px-4 border-b border-gray-200">{{ $item->pemilik ?? 'N/A' }}</td>
-                                <td class="py-2 px-4 border-b border-gray-200">{{ \Carbon\Carbon::parse($item->tahun_beli)->format('d-m-Y') ?? 'N/A' }}</td>
+                                <td class="py-2 px-4 border-b border-gray-200">{{ $item->unit->nama_unit ?? 'N/A' }}</td>
+                                <td class="py-2 px-4 border-b border-gray-200">{{ $item->room->nama_ruangan ?? 'N/A' }}</td>
                                 <td class="py-2 px-4 border-b border-gray-200">
                                     @if ($item->kategori === 'habis_pakai')
                                         {{ $item->stokHabisPakai->sum('jumlah_masuk') - $item->stokHabisPakai->sum('jumlah_keluar') }}
@@ -72,7 +82,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="py-4 px-4 text-center text-gray-500">Tidak ada inventaris yang ditemukan.</td>
+                                <td colspan="13" class="py-4 px-4 text-center text-gray-500">Tidak ada inventaris yang ditemukan.</td>
                             </tr>
                         @endforelse
                     </tbody>

@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('id_inventaris');
             $table->integer('jumlah_masuk')->notNullable();
             $table->integer('jumlah_keluar')->default(0);
-            $table->integer('sisa_stok')->storedAs('jumlah_masuk - jumlah_keluar');
             $table->date('tanggal')->notNullable();
             $table->timestamps();
 

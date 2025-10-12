@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Item;
+use App\Models\Inventaris;
 use App\Models\User;
 
 class Acquisition extends Model
@@ -20,7 +20,7 @@ class Acquisition extends Model
 
     public function item()
     {
-        return $this->belongsTo(Item::class);
+        return $this->belongsTo(Inventaris::class);
     }
 
     public function user()

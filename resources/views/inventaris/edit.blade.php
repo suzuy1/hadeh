@@ -5,7 +5,7 @@
         <h1 class="text-3xl font-bold leading-tight text-gray-900 mb-8">Edit Inventaris: {{ $inventaris->nama_barang }}</h1>
 
         <div class="bg-white shadow-md rounded-lg p-6">
-            <form action="{{ route('inventaris.update', $inventaris) }}" method="POST">
+            <form action="{{ route('inventaris.update', $inventaris) }}" method="POST" x-data="{ kategori: '{{ old('kategori', $inventaris->kategori) }}' }">
                 @csrf
                 @method('PUT')
 
@@ -17,11 +17,14 @@
                     @enderror
                 </div>
 
-
                 <div class="mb-4">
-                    <label for="kategori_inventaris" class="block text-gray-700 text-sm font-bold mb-2">Kategori Inventaris (ex: inv):</label>
-                    <input type="text" name="kategori_inventaris" id="kategori_inventaris" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('kategori_inventaris') border-red-500 @enderror" value="{{ old('kategori_inventaris', $inventaris->kategori) }}" required>
-                    @error('kategori_inventaris')
+                    <label for="kategori" class="block text-gray-700 text-sm font-bold mb-2">Kategori Inventaris:</label>
+                    <select name="kategori" id="kategori" x-model="kategori" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('kategori') border-red-500 @enderror" required>
+                        <option value="tidak_habis_pakai" {{ old('kategori', $inventaris->kategori) == 'tidak_habis_pakai' ? 'selected' : '' }}>Barang Tidak Habis Pakai</option>
+                        <option value="habis_pakai" {{ old('kategori', $inventaris->kategori) == 'habis_pakai' ? 'selected' : '' }}>Barang Habis Pakai</option>
+                        <option value="aset_tetap" {{ old('kategori', $inventaris->kategori) == 'aset_tetap' ? 'selected' : '' }}>Aset Tetap</option>
+                    </select>
+                    @error('kategori')
                         <p class="text-red-500 text-xs italic">{{ $message }}</p>
                     @enderror
                 </div>
@@ -70,6 +73,32 @@
                     <label for="lokasi" class="block text-gray-700 text-sm font-bold mb-2">Lokasi (Opsional):</label>
                     <input type="text" name="lokasi" id="lokasi" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('lokasi') border-red-500 @enderror" value="{{ old('lokasi', $inventaris->lokasi) }}">
                     @error('lokasi')
+                        <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label for="unit_id" class="block text-gray-700 text-sm font-bold mb-2">Unit:</label>
+                    <select name="unit_id" id="unit_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('unit_id') border-red-500 @enderror" required>
+                        <option value="">Pilih Unit</option>
+                        @foreach($units as $unit)
+                            <option value="{{ $unit->id }}" {{ old('unit_id', $inventaris->unit_id) == $unit->id ? 'selected' : '' }}>{{ $unit->nama_unit }}</option>
+                        @endforeach
+                    </select>
+                    @error('unit_id')
+                        <p class="text-red-500 text-xs italic">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="mb-4">
+                    <label for="room_id" class="block text-gray-700 text-sm font-bold mb-2">Ruangan:</label>
+                    <select name="room_id" id="room_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('room_id') border-red-500 @enderror" required>
+                        <option value="">Pilih Ruangan</option>
+                        @foreach($rooms as $room)
+                            <option value="{{ $room->id }}" {{ old('room_id', $inventaris->room_id) == $room->id ? 'selected' : '' }}>{{ $room->nama_ruangan }}</option>
+                        @endforeach
+                    </select>
+                    @error('room_id')
                         <p class="text-red-500 text-xs italic">{{ $message }}</p>
                     @enderror
                 </div>

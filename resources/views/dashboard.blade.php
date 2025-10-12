@@ -96,6 +96,18 @@
                         </a>
                     </li>
                     <li class="mb-2">
+                        <a href="{{ route('units.index') }}" class="flex items-center py-2.5 px-4 rounded transition-colors {{ request()->routeIs('units.*') ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-slate-700' }}">
+                            <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m-1.5 3h1.5M12 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m-1.5 3h1.5M15 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m-1.5 3h1.5M18 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m-1.5 3h1.5" /></svg>
+                            Unit
+                        </a>
+                    </li>
+                    <li class="mb-2">
+                        <a href="{{ route('rooms.index') }}" class="flex items-center py-2.5 px-4 rounded transition-colors {{ request()->routeIs('rooms.*') ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-slate-700' }}">
+                           <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" /></svg>
+                            Ruangan
+                        </a>
+                    </li>
+                    <li class="mb-2">
                         <a href="{{ route('users.index') }}" class="flex items-center py-2.5 px-4 rounded transition-colors {{ request()->routeIs('users.*') ? 'bg-blue-600 text-white font-semibold' : 'hover:bg-slate-700' }}">
                             <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197M15 11a4 4 0 110-5.292M12 4.354a4 4 0 010 5.292"></path></svg>
                             Pengguna

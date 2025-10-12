@@ -10,6 +10,7 @@ use App\Models\StokHabisPakai; // New import
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\InventarisExport;
 use App\Imports\InventarisImport;
+use Illuminate\Support\Facades\DB;
 
 class InventarisController extends Controller // Changed class name
 {
@@ -18,10 +19,10 @@ class InventarisController extends Controller // Changed class name
      */
     public function index(Request $request)
     {
-        $query = Inventaris::with(['room', 'unit', 'stokHabisPakai']); // Eager load new relationships
+        $query = Inventaris::with(['room', 'unit', 'stokHabisPakai']);
 
-        $inventaris = $query->get(); // Changed variable name
-        return view('inventaris.index', compact('inventaris')); // Changed view name and variable
+        $inventaris = $query->get();
+        return view('inventaris.index', compact('inventaris'));
     }
 
     /**
@@ -41,28 +42,30 @@ class InventarisController extends Controller // Changed class name
     {
         $validatedData = $request->validate([
             'nama_barang' => 'required|string|max:100',
-            'kategori_inventaris' => 'required|string|max:10', // This is the 'kategori' field in inventaris table
+            'kategori' => 'required|in:habis_pakai,tidak_habis_pakai,aset_tetap',
             'pemilik' => 'required|string|max:50',
             'sumber_dana' => 'required|string|max:50',
             'tahun_beli' => 'required|date',
             'nomor_unit' => 'required|integer|min:1',
             'kondisi' => 'nullable|string|max:50',
             'lokasi' => 'nullable|string|max:100',
-            'initial_stok' => 'nullable|integer|min:0', // For habis_pakai items
+            'initial_stok' => 'nullable|integer|min:0',
+            'unit_id' => 'required|exists:units,id',
+            'room_id' => 'required|exists:rooms,id',
         ]);
 
         // Generate kode_inventaris
         $kode_inventaris = sprintf(
             '%s/%s/%s/%s/%03d',
-            $validatedData['kategori_inventaris'],
+            $validatedData['kategori'],
             $validatedData['pemilik'],
             $validatedData['sumber_dana'],
-            $validatedData['tahun_beli'],
+            date('Y', strtotime($validatedData['tahun_beli'])),
             $validatedData['nomor_unit']
         );
 
         $inventaris = Inventaris::create([
-            'kategori' => $validatedData['kategori_inventaris'],
+            'kategori' => $validatedData['kategori'],
             'pemilik' => $validatedData['pemilik'],
             'sumber_dana' => $validatedData['sumber_dana'],
             'tahun_beli' => $validatedData['tahun_beli'],
@@ -71,10 +74,21 @@ class InventarisController extends Controller // Changed class name
             'nama_barang' => $validatedData['nama_barang'],
             'kondisi' => $validatedData['kondisi'],
             'lokasi' => $validatedData['lokasi'],
+            'unit_id' => $validatedData['unit_id'],
+            'room_id' => $validatedData['room_id'],
         ]);
 
+        // Hanya buat entri stok jika kategorinya 'habis_pakai' dan stok awal diisi
+        if ($validatedData['kategori'] === 'habis_pakai' && isset($validatedData['initial_stok']) && $validatedData['initial_stok'] > 0) {
+            StokHabisPakai::create([
+                'id_inventaris' => $inventaris->id,
+                'jumlah_masuk' => $validatedData['initial_stok'],
+                'jumlah_keluar' => 0,
+                'tanggal' => now()->toDateString(),
+            ]);
+        }
 
-        return redirect()->route('inventaris.index')->with('success', 'Inventaris created successfully!'); // Changed route and message
+        return redirect()->route('inventaris.index')->with('success', 'Inventaris berhasil dibuat!');
     }
 
     /**
@@ -99,33 +113,35 @@ class InventarisController extends Controller // Changed class name
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Inventaris $inventaris) // Changed model type
+    public function update(Request $request, Inventaris $inventaris)
     {
         $validatedData = $request->validate([
             'nama_barang' => 'required|string|max:100',
-            'kategori_inventaris' => 'required|string|max:10',
+            'kategori' => 'required|in:habis_pakai,tidak_habis_pakai,aset_tetap',
             'pemilik' => 'required|string|max:50',
             'sumber_dana' => 'required|string|max:50',
             'tahun_beli' => 'required|date',
             'nomor_unit' => 'required|integer|min:1',
             'kondisi' => 'nullable|string|max:50',
             'lokasi' => 'nullable|string|max:100',
+            'unit_id' => 'required|exists:units,id',
+            'room_id' => 'required|exists:rooms,id',
         ]);
 
-        // Re-generate kode_inventaris if any relevant fields changed
+        // Generate kode_inventaris
         $kode_inventaris = sprintf(
             '%s/%s/%s/%s/%03d',
-            $validatedData['kategori_inventaris'],
+            $validatedData['kategori'],
             $validatedData['pemilik'],
             $validatedData['sumber_dana'],
-            $validatedData['tahun_beli'],
+            date('Y', strtotime($validatedData['tahun_beli'])),
             $validatedData['nomor_unit']
         );
         $validatedData['kode_inventaris'] = $kode_inventaris;
 
         $inventaris->update($validatedData);
 
-        return redirect()->route('inventaris.index')->with('success', 'Inventaris updated successfully!'); // Changed route and message
+        return redirect()->route('inventaris.index')->with('success', 'Inventaris berhasil diperbarui!');
     }
 
     /**

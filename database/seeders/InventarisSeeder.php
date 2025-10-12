@@ -21,7 +21,6 @@ class InventarisSeeder extends Seeder
             'tahun_beli' => 2023,
             'kondisi' => 'Baik',
             'lokasi' => 'Rak 1',
-            'id_jenis' => 1, // Alat Tulis (habis_pakai)
             'room_id' => 1, // Laboratorium Komputer
             'unit_id' => 1, // Fakultas Teknik
             'nomor_unit' => 1,
@@ -42,7 +41,6 @@ class InventarisSeeder extends Seeder
             'tahun_beli' => 2024,
             'kondisi' => 'Baik',
             'lokasi' => 'Meja 5',
-            'id_jenis' => 2, // Elektronik (tidak_habis_pakai)
             'room_id' => 2, // Ruang Kuliah A
             'unit_id' => 2, // Fakultas Ekonomi
             'nomor_unit' => 2,
@@ -57,7 +55,6 @@ class InventarisSeeder extends Seeder
             'tahun_beli' => 2022,
             'kondisi' => 'Rusak Ringan',
             'lokasi' => 'Area Baca',
-            'id_jenis' => 3, // Perabot Kantor (tidak_habis_pakai)
             'room_id' => 3, // Ruang Administrasi
             'unit_id' => 3, // Perpustakaan
             'nomor_unit' => 3,
@@ -72,7 +69,6 @@ class InventarisSeeder extends Seeder
             'tahun_beli' => 2023,
             'kondisi' => 'Baik',
             'lokasi' => 'Rak 1',
-            'id_jenis' => 1, // Alat Tulis (habis_pakai)
             'room_id' => 1, // Laboratorium Komputer
             'unit_id' => 1, // Fakultas Teknik
             'nomor_unit' => 4,

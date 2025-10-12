@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Item;
+use App\Models\Inventaris;
 
 class Room extends Model
 {
@@ -15,7 +15,7 @@ class Room extends Model
 
     public function items()
     {
-        return $this->hasMany(Item::class);
+        return $this->hasMany(Inventaris::class);
     }
 
     public function unit()
