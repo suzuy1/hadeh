@@ -62,11 +62,26 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="kondisi" class="block text-gray-700 text-sm font-bold mb-2">Kondisi (Opsional, default 'baik'):</label>
-                    <input type="text" name="kondisi" id="kondisi" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('kondisi') border-red-500 @enderror" value="{{ old('kondisi', $inventaris->kondisi) }}">
-                    @error('kondisi')
-                        <p class="text-red-500 text-xs italic">{{ $message }}</p>
-                    @enderror
+                    <label class="block text-gray-700 text-sm font-bold mb-2">Jumlah Kondisi Barang:</label>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label for="kondisi_baik" class="block text-sm font-medium text-gray-500">Baik</label>
+                            <input type="number" name="kondisi_baik" id="kondisi_baik" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" value="{{ old('kondisi_baik', $inventaris->kondisi_baik) }}" min="0">
+                        </div>
+                        <div>
+                            <label for="kondisi_rusak_ringan" class="block text-sm font-medium text-gray-500">Rusak Ringan</label>
+                            <input type="number" name="kondisi_rusak_ringan" id="kondisi_rusak_ringan" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" value="{{ old('kondisi_rusak_ringan', $inventaris->kondisi_rusak_ringan) }}" min="0">
+                        </div>
+                        <div>
+                            <label for="kondisi_rusak_berat" class="block text-sm font-medium text-gray-500">Rusak Berat</label>
+                            <input type="number" name="kondisi_rusak_berat" id="kondisi_rusak_berat" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" value="{{ old('kondisi_rusak_berat', $inventaris->kondisi_rusak_berat) }}" min="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="keterangan" class="block text-gray-700 text-sm font-bold mb-2">Keterangan (Opsional):</label>
+                    <textarea name="keterangan" id="keterangan" rows="3" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700">{{ old('keterangan', $inventaris->keterangan) }}</textarea>
                 </div>
 
                 <div class="mb-4">

@@ -72,64 +72,62 @@
             </div>
             <div class="border-t border-gray-200">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kode Inventaris</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Barang</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategori</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pemilik</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sumber Dana</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tahun Beli</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomor Unit</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kondisi</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ruangan</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stok (Habis Pakai)</th>
-                                <th scope="col" class="relative px-6 py-3">
-                                    <span class="sr-only">Aksi</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse ($inventaris as $item)
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item->kode_inventaris }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->nama_barang }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->kategori }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->pemilik ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->sumber_dana ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ \Carbon\Carbon::parse($item->tahun_beli)->format('d-m-Y') ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->nomor_unit ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->kondisi ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->lokasi ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->unit->nama_unit ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->room->nama_ruangan ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        @if ($item->kategori === 'habis_pakai')
-                                            {{ $item->stokHabisPakai->sum('jumlah_masuk') - $item->stokHabisPakai->sum('jumlah_keluar') }}
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <a href="{{ route('inventaris.show', $item) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">Lihat</a>
-                                        <a href="{{ route('inventaris.edit', $item) }}" class="text-yellow-600 hover:text-yellow-900 mr-4">Edit</a>
-                                        <form action="{{ route('inventaris.destroy', $item) }}" method="POST" class="inline-block">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Apakah Anda yakin ingin menghapus inventaris ini?')">Hapus</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="13" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">Tidak ada inventaris yang ditemukan.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+<table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+        <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kode Inventaris</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Inventaris</th>
+            <th scope="col" colspan="3" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Kondisi Barang</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keterangan</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
+            <th scope="col" class="relative px-6 py-3">
+                <span class="sr-only">Aksi</span>
+            </th>
+        </tr>
+        <tr>
+            {{-- Kolom kosong untuk baris kedua --}}
+            <th scope="col" class="px-6 py-2"></th>
+            <th scope="col" class="px-6 py-2"></th>
+            <th scope="col" class="px-6 py-2"></th>
+            {{-- Sub-kolom untuk kondisi --}}
+            <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-l border-gray-200">Baik</th>
+            <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-l border-gray-200">Rusak Ringan</th>
+            <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-l border-gray-200">Rusak Berat</th>
+            {{-- Kolom kosong lainnya --}}
+            <th scope="col" class="px-6 py-2"></th>
+            <th scope="col" class="px-6 py-2"></th>
+            <th scope="col" class="px-6 py-2"></th>
+        </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+        @forelse ($inventaris as $item)
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item->kode_inventaris }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->nama_barang }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500">{{ $item->kondisi_baik }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500">{{ $item->kondisi_rusak_ringan }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500">{{ $item->kondisi_rusak_berat }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->keterangan ?? 'N/A' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->lokasi ?? 'N/A' }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <a href="{{ route('inventaris.show', $item) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">Lihat</a>
+                    <a href="{{ route('inventaris.edit', $item) }}" class="text-yellow-600 hover:text-yellow-900 mr-4">Edit</a>
+                    <form action="{{ route('inventaris.destroy', $item) }}" method="POST" class="inline-block">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Apakah Anda yakin ingin menghapus inventaris ini?')">Hapus</button>
+                    </form>
+                </td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="10" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">Tidak ada inventaris yang ditemukan.</td>
+            </tr>
+        @endforelse
+    </tbody>
+</table>
                 </div>
             </div>
         </div>

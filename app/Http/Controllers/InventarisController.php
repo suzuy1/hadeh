@@ -47,17 +47,19 @@ class InventarisController extends Controller // Changed class name
             'sumber_dana' => 'required|string|max:50',
             'tahun_beli' => 'required|date',
             'nomor_unit' => 'required|integer|min:1',
-            'kondisi' => 'nullable|string|max:50',
+            'kondisi_baik' => 'required|integer|min:0',
+            'kondisi_rusak_ringan' => 'required|integer|min:0',
+            'kondisi_rusak_berat' => 'required|integer|min:0',
+            'keterangan' => 'nullable|string',
             'lokasi' => 'nullable|string|max:100',
             'initial_stok' => 'nullable|integer|min:0',
             'unit_id' => 'required|exists:units,id',
             'room_id' => 'required|exists:rooms,id',
         ]);
-
+        
         // Generate kode_inventaris
         $kode_inventaris = sprintf(
-            '%s/%s/%s/%s/%03d',
-            $validatedData['kategori'],
+            'inv/%s/%s/%s/%02d',
             $validatedData['pemilik'],
             $validatedData['sumber_dana'],
             date('Y', strtotime($validatedData['tahun_beli'])),
@@ -72,7 +74,10 @@ class InventarisController extends Controller // Changed class name
             'nomor_unit' => $validatedData['nomor_unit'],
             'kode_inventaris' => $kode_inventaris,
             'nama_barang' => $validatedData['nama_barang'],
-            'kondisi' => $validatedData['kondisi'],
+            'kondisi_baik' => $validatedData['kondisi_baik'],
+            'kondisi_rusak_ringan' => $validatedData['kondisi_rusak_ringan'],
+            'kondisi_rusak_berat' => $validatedData['kondisi_rusak_berat'],
+            'keterangan' => $validatedData['keterangan'],
             'lokasi' => $validatedData['lokasi'],
             'unit_id' => $validatedData['unit_id'],
             'room_id' => $validatedData['room_id'],
@@ -122,7 +127,10 @@ class InventarisController extends Controller // Changed class name
             'sumber_dana' => 'required|string|max:50',
             'tahun_beli' => 'required|date',
             'nomor_unit' => 'required|integer|min:1',
-            'kondisi' => 'nullable|string|max:50',
+            'kondisi_baik' => 'required|integer|min:0',
+            'kondisi_rusak_ringan' => 'required|integer|min:0',
+            'kondisi_rusak_berat' => 'required|integer|min:0',
+            'keterangan' => 'nullable|string',
             'lokasi' => 'nullable|string|max:100',
             'unit_id' => 'required|exists:units,id',
             'room_id' => 'required|exists:rooms,id',
@@ -130,8 +138,7 @@ class InventarisController extends Controller // Changed class name
 
         // Generate kode_inventaris
         $kode_inventaris = sprintf(
-            '%s/%s/%s/%s/%03d',
-            $validatedData['kategori'],
+            'inv/%s/%s/%s/%02d',
             $validatedData['pemilik'],
             $validatedData['sumber_dana'],
             date('Y', strtotime($validatedData['tahun_beli'])),
