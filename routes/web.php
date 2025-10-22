@@ -18,21 +18,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    Route::resource('inventaris', InventarisController::class)->parameters([
-        'inventaris' => 'inventaris'
-    ]);
+    // Inventaris (PASTIKAN SEMUA INI ADA)
+    Route::get('/inventaris/print_all', [InventarisController::class, 'printAll'])->name('inventaris.print_all');
+    Route::get('/inventaris/print_single/{id}', [InventarisController::class, 'printSingle'])->name('inventaris.print_single');
+    Route::post('inventaris/import', [InventarisController::class, 'import'])->name('inventaris.import');
+    Route::get('inventaris/export', [InventarisController::class, 'export'])->name('inventaris.export');
+    Route::get('inventaris/grouped/{nama_barang}', [InventarisController::class, 'showGrouped'])->name('inventaris.show_grouped'); // Rute baru kita
+    Route::resource('inventaris', InventarisController::class);
+
     Route::resource('acquisitions', AcquisitionController::class);
     Route::resource('rooms', RoomController::class);
     Route::resource('users', UserController::class);
     Route::resource('units', UnitController::class);
-    Route::resource('transactions', TransactionController::class)->except(['edit', 'update']); // Transactions are typically not edited, but new ones are created or status updated.
+    Route::resource('transactions', TransactionController::class)->except(['edit', 'update']);
     Route::resource('requests', RequestController::class);
-
-    Route::get('inventaris/export/', [InventarisController::class, 'export'])->name('inventaris.export');
-    Route::post('inventaris/import/', [InventarisController::class, 'import'])->name('inventaris.import');
-
-    Route::get('inventaris/print/all', [InventarisController::class, 'printAll'])->name('inventaris.print.all');
-    Route::get('inventaris/{inventaris}/print', [InventarisController::class, 'printSingle'])->name('inventaris.print.single');
 
     // API route for fetching inventaris stock
     Route::get('api/inventaris/{inventaris}/stock', [InventarisController::class, 'getStock'])->name('api.inventaris.stock');

@@ -19,9 +19,23 @@ class InventarisController extends Controller // Changed class name
      */
     public function index(Request $request)
     {
-        $query = Inventaris::with(['room', 'unit', 'stokHabisPakai']);
+        // Logika untuk mengelompokkan inventaris berdasarkan nama_barang
+        $query = Inventaris::select(
+            'nama_barang',
+            DB::raw('SUM(kondisi_baik) as total_baik'),
+            DB::raw('SUM(kondisi_rusak_ringan) as total_rusak_ringan'),
+            DB::raw('SUM(kondisi_rusak_berat) as total_rusak_berat'),
+            // Ambil data lokasi dan keterangan dari salah satu item sebagai perwakilan
+            DB::raw('MAX(keterangan) as keterangan'),
+            DB::raw('MAX(room_id) as room_id')
+        )->groupBy('nama_barang');
 
-        $inventaris = $query->get();
+        if ($request->has('search')) {
+            $query->where('nama_barang', 'like', '%' . $request->search . '%');
+        }
+
+        $inventaris = $query->paginate(10);
+
         return view('inventaris.index', compact('inventaris'));
     }
 
@@ -30,9 +44,7 @@ class InventarisController extends Controller // Changed class name
      */
     public function create()
     {
-        $rooms = Room::all();
-        $units = Unit::all();
-        return view('inventaris.create', compact('rooms', 'units'));
+        // ... (kode di fungsi ini tidak perlu diubah)
     }
 
     /**
@@ -40,174 +52,79 @@ class InventarisController extends Controller // Changed class name
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'nama_barang' => 'required|string|max:100',
-            'kategori' => 'required|in:habis_pakai,tidak_habis_pakai,aset_tetap',
-            'pemilik' => 'required|string|max:50',
-            'sumber_dana' => 'required|string|max:50',
-            'tahun_beli' => 'required|date',
-            'nomor_unit' => 'required|integer|min:1',
-            'kondisi_baik' => 'required|integer|min:0',
-            'kondisi_rusak_ringan' => 'required|integer|min:0',
-            'kondisi_rusak_berat' => 'required|integer|min:0',
-            'keterangan' => 'nullable|string',
-            'lokasi' => 'nullable|string|max:100',
-            'initial_stok' => 'nullable|integer|min:0',
-            'unit_id' => 'required|exists:units,id',
-            'room_id' => 'required|exists:rooms,id',
-        ]);
-        
-        // Generate kode_inventaris
-        $kode_inventaris = sprintf(
-            'inv/%s/%s/%s/%02d',
-            $validatedData['pemilik'],
-            $validatedData['sumber_dana'],
-            date('Y', strtotime($validatedData['tahun_beli'])),
-            $validatedData['nomor_unit']
-        );
-
-        $inventaris = Inventaris::create([
-            'kategori' => $validatedData['kategori'],
-            'pemilik' => $validatedData['pemilik'],
-            'sumber_dana' => $validatedData['sumber_dana'],
-            'tahun_beli' => $validatedData['tahun_beli'],
-            'nomor_unit' => $validatedData['nomor_unit'],
-            'kode_inventaris' => $kode_inventaris,
-            'nama_barang' => $validatedData['nama_barang'],
-            'kondisi_baik' => $validatedData['kondisi_baik'],
-            'kondisi_rusak_ringan' => $validatedData['kondisi_rusak_ringan'],
-            'kondisi_rusak_berat' => $validatedData['kondisi_rusak_berat'],
-            'keterangan' => $validatedData['keterangan'],
-            'lokasi' => $validatedData['lokasi'],
-            'unit_id' => $validatedData['unit_id'],
-            'room_id' => $validatedData['room_id'],
-        ]);
-
-        // Hanya buat entri stok jika kategorinya 'habis_pakai' dan stok awal diisi
-        if ($validatedData['kategori'] === 'habis_pakai' && isset($validatedData['initial_stok']) && $validatedData['initial_stok'] > 0) {
-            StokHabisPakai::create([
-                'id_inventaris' => $inventaris->id,
-                'jumlah_masuk' => $validatedData['initial_stok'],
-                'jumlah_keluar' => 0,
-                'tanggal' => now()->toDateString(),
-            ]);
-        }
-
-        return redirect()->route('inventaris.index')->with('success', 'Inventaris berhasil dibuat!');
+        // ... (kode di fungsi ini tidak perlu diubah)
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Inventaris $inventaris) // Changed model type
+    public function show(Inventaris $inventari)
     {
-        $inventaris->load(['room', 'unit']); // Eager load new relationships
-        return view('inventaris.show', compact('inventaris')); // Changed view name and variable
+        // ... (kode di fungsi ini tidak perlu diubah, karena masih bisa dipakai untuk detail per-unit)
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Inventaris $inventaris) // Changed model type
+    public function edit(Inventaris $inventari)
     {
-        $rooms = Room::all();
-        $units = Unit::all();
-        return view('inventaris.edit', compact('inventaris', 'rooms', 'units')); // Changed view name and variable
+       // ... (kode di fungsi ini tidak perlu diubah)
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Inventaris $inventaris)
+    public function update(Request $request, Inventaris $inventari)
     {
-        $validatedData = $request->validate([
-            'nama_barang' => 'required|string|max:100',
-            'kategori' => 'required|in:habis_pakai,tidak_habis_pakai,aset_tetap',
-            'pemilik' => 'required|string|max:50',
-            'sumber_dana' => 'required|string|max:50',
-            'tahun_beli' => 'required|date',
-            'nomor_unit' => 'required|integer|min:1',
-            'kondisi_baik' => 'required|integer|min:0',
-            'kondisi_rusak_ringan' => 'required|integer|min:0',
-            'kondisi_rusak_berat' => 'required|integer|min:0',
-            'keterangan' => 'nullable|string',
-            'lokasi' => 'nullable|string|max:100',
-            'unit_id' => 'required|exists:units,id',
-            'room_id' => 'required|exists:rooms,id',
-        ]);
-
-        // Generate kode_inventaris
-        $kode_inventaris = sprintf(
-            'inv/%s/%s/%s/%02d',
-            $validatedData['pemilik'],
-            $validatedData['sumber_dana'],
-            date('Y', strtotime($validatedData['tahun_beli'])),
-            $validatedData['nomor_unit']
-        );
-        $validatedData['kode_inventaris'] = $kode_inventaris;
-
-        $inventaris->update($validatedData);
-
-        return redirect()->route('inventaris.index')->with('success', 'Inventaris berhasil diperbarui!');
+        // ... (kode di fungsi ini tidak perlu diubah)
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Inventaris $inventaris) // Changed model type
+    public function destroy(Inventaris $inventari)
     {
-        $inventaris->delete();
-
-        return redirect()->route('inventaris.index')->with('success', 'Inventaris deleted successfully!'); // Changed route and message
+        // ... (kode di fungsi ini tidak perlu diubah)
     }
 
-    /**
-     * Export items to Excel.
-     */
     public function export()
     {
         return Excel::download(new InventarisExport, 'inventaris.xlsx');
     }
 
-    /**
-     * Import items from Excel.
-     */
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv',
+            'file' => 'required|mimes:xlsx,xls,csv'
         ]);
+
         Excel::import(new InventarisImport, $request->file('file'));
-        return redirect()->route('inventaris.index')->with('success', 'Inventaris imported successfully!');
+
+        return redirect()->route('inventaris.index')->with('success', 'Data inventaris berhasil diimpor.');
     }
 
-    /**
-     * Print all items.
-     */
     public function printAll()
     {
-        $inventaris = Inventaris::with(['room', 'unit'])->get(); // Eager load new relationships
-        return view('inventaris.print_all', compact('inventaris')); // Changed view name and variable
+        $inventaris = Inventaris::with(['room', 'unit'])->get();
+        return view('inventaris.print_all', compact('inventaris'));
     }
 
-    /**
-     * Print a single item.
-     */
-    public function printSingle(Inventaris $inventaris) // Changed model type
+    public function printSingle($id)
     {
-        $inventaris->load(['room', 'unit']); // Eager load new relationships
-        return view('inventaris.print_single', compact('inventaris')); // Changed view name and variable
+        $inventaris = Inventaris::with(['room', 'unit'])->findOrFail($id);
+        return view('inventaris.print_single', compact('inventaris'));
     }
 
-    /**
-     * Get the current stock of an inventaris item (for consumable items).
-     */
-    public function getStock(Inventaris $inventaris)
+    // FUNGSI BARU UNTUK MENAMPILKAN DETAIL GRUP
+    public function showGrouped($nama_barang)
     {
-        if ($inventaris->kategori === 'habis_pakai') {
-            $currentStock = StokHabisPakai::where('id_inventaris', $inventaris->id)->sum(DB::raw('jumlah_masuk - jumlah_keluar'));
-            return response()->json(['sisa_stok' => $currentStock]);
-        }
-        return response()->json(['sisa_stok' => 'Tidak Berlaku']);
+        $inventarisDetails = Inventaris::with(['room', 'unit'])
+            ->where('nama_barang', $nama_barang)
+            ->paginate(10);
+            
+        // Ambil nama barang untuk judul halaman
+        $namaBarang = $nama_barang;
+
+        return view('inventaris.show_grouped', compact('inventarisDetails', 'namaBarang'));
     }
 }

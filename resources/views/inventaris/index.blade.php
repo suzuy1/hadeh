@@ -1,133 +1,94 @@
-@extends('dashboard')
+@extends('dashboard') {{-- ATAU SESUAIKAN DENGAN FILE LAYOUT UTAMA KAMU --}}
 
 @section('content')
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-extrabold text-gray-900">Daftar Inventaris</h1>
-            <div class="flex flex-wrap items-center gap-3">
-                <a href="{{ route('inventaris.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition ease-in-out duration-150">
-                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-                    </svg>
-                    Tambah Inventaris Baru
+    <div class="p-4 sm:p-6 lg:p-8">
+        <div class="sm:flex sm:items-center">
+            <div class="sm:flex-auto">
+                <h1 class="text-2xl font-semibold leading-6 text-gray-900">Daftar Inventaris</h1>
+                <p class="mt-2 text-sm text-gray-700">Berikut adalah daftar inventaris yang dikelompokkan berdasarkan nama.</p>
+            </div>
+            <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+                <a href="{{ route('inventaris.create') }}" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                    Tambah Inventaris
                 </a>
-                <a href="{{ route('inventaris.export') }}" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition ease-in-out duration-150">
-                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V4a1 1 0 112 0v6.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                    Ekspor
-                </a>
-                <form action="{{ route('inventaris.import') }}" method="POST" enctype="multipart/form-data" class="inline-block">
-                    @csrf
-                    <input type="file" name="file" class="hidden" id="import_file" onchange="this.form.submit()">
-                    <button type="button" onclick="document.getElementById('import_file').click()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition ease-in-out duration-150">
-                        <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L6.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                        </svg>
-                        Impor
-                    </button>
-                </form>
-                <a href="{{ route('inventaris.print.all') }}" target="_blank" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150">
-                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fill-rule="evenodd" d="M5 4V2a2 2 0 012-2h6a2 2 0 012 2v2h2a2 2 0 012 2v3a2 2 0 01-2 2H3a2 2 0 01-2-2V6a2 2 0 012-2h2zm0 2h10v3H5V6zm11 7a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3a1 1 0 011-1h12z" clip-rule="evenodd" />
-                    </svg>
-                    Cetak Semua
-                </a>
+                <button onclick="document.getElementById('importModal').classList.remove('hidden')" class="ml-2 inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500">Impor Data</button>
+                <a href="{{ route('inventaris.export') }}" class="ml-2 inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500">Ekspor Data</a>
+                <a href="{{ route('inventaris.print_all') }}" target="_blank" class="ml-2 inline-flex items-center rounded-md bg-gray-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-500">Cetak Semua</a>
             </div>
         </div>
 
-        @if (session('success'))
-            <div class="rounded-md bg-green-50 p-4 mb-6">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm font-medium text-green-800">{{ session('success') }}</p>
-                    </div>
-                </div>
-            </div>
-        @endif
-        @if (session('info'))
-            <div class="rounded-md bg-blue-50 p-4 mb-6">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm font-medium text-blue-800">{{ session('info') }}</p>
-                    </div>
-                </div>
-            </div>
-        @endif
+        <div class="mt-4">
+            <form action="{{ route('inventaris.index') }}" method="GET">
+                <input type="text" name="search" placeholder="Cari nama barang..." class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value="{{ request('search') }}">
+            </form>
+        </div>
 
-        <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-            <div class="px-4 py-5 sm:px-6">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">Semua Inventaris</h3>
-                <p class="mt-1 max-w-2xl text-sm text-gray-500">Daftar lengkap semua inventaris yang terdaftar dalam sistem.</p>
+        <div class="mt-8 flow-root">
+            <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                    <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-300">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">No</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Nama Inventaris</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Baik</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Rusak Ringan</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Total Rusak Berat</th>
+                                    <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Keterangan</th>
+                                    <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
+                                        <span class="sr-only">Aksi</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white">
+                                @forelse ($inventaris as $item)
+                                    <tr>
+                                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">{{ $loop->iteration }}</td>
+                                        <td class="whitespace-nowrap px-3 py-4 text-sm font-semibold text-gray-800">{{ $item->nama_barang }}</td>
+                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $item->total_baik }}</td>
+                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $item->total_rusak_ringan }}</td>
+                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $item->total_rusak_berat }}</td>
+                                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $item->keterangan }}</td>
+                                        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                                            <a href="{{ route('inventaris.show_grouped', ['nama_barang' => $item->nama_barang]) }}" class="text-indigo-600 hover:text-indigo-900">Lihat Detail</a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="whitespace-nowrap px-3 py-4 text-sm text-center text-gray-500">Tidak ada data</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <div class="border-t border-gray-200">
-                <div class="overflow-x-auto">
-<table class="min-w-full divide-y divide-gray-200">
-    <thead class="bg-gray-50">
-        <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kode Inventaris</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Inventaris</th>
-            <th scope="col" colspan="3" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Kondisi Barang</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Keterangan</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lokasi</th>
-            <th scope="col" class="relative px-6 py-3">
-                <span class="sr-only">Aksi</span>
-            </th>
-        </tr>
-        <tr>
-            {{-- Kolom kosong untuk baris kedua --}}
-            <th scope="col" class="px-6 py-2"></th>
-            <th scope="col" class="px-6 py-2"></th>
-            <th scope="col" class="px-6 py-2"></th>
-            {{-- Sub-kolom untuk kondisi --}}
-            <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-l border-gray-200">Baik</th>
-            <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-l border-gray-200">Rusak Ringan</th>
-            <th scope="col" class="px-2 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider border-l border-gray-200">Rusak Berat</th>
-            {{-- Kolom kosong lainnya --}}
-            <th scope="col" class="px-6 py-2"></th>
-            <th scope="col" class="px-6 py-2"></th>
-            <th scope="col" class="px-6 py-2"></th>
-        </tr>
-    </thead>
-    <tbody class="bg-white divide-y divide-gray-200">
-        @forelse ($inventaris as $item)
-            <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item->kode_inventaris }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->nama_barang }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500">{{ $item->kondisi_baik }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500">{{ $item->kondisi_rusak_ringan }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500">{{ $item->kondisi_rusak_berat }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->keterangan ?? 'N/A' }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item->lokasi ?? 'N/A' }}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <a href="{{ route('inventaris.show', $item) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">Lihat</a>
-                    <a href="{{ route('inventaris.edit', $item) }}" class="text-yellow-600 hover:text-yellow-900 mr-4">Edit</a>
-                    <form action="{{ route('inventaris.destroy', $item) }}" method="POST" class="inline-block">
+             <div class="mt-4">
+                {{ $inventaris->links() }}
+            </div>
+        </div>
+    </div>
+
+    <div id="importModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">Impor Data Inventaris</h3>
+                <div class="mt-2 px-7 py-3">
+                    <form action="{{ route('inventaris.import') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        @method('DELETE')
-                        <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Apakah Anda yakin ingin menghapus inventaris ini?')">Hapus</button>
+                        <input type="file" name="file" class="text-sm">
+                        <div class="items-center px-4 py-3">
+                            <button type="submit" class="px-4 py-2 bg-green-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-300">
+                                Impor
+                            </button>
+                        </div>
                     </form>
-                </td>
-            </tr>
-        @empty
-            <tr>
-                <td colspan="10" class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">Tidak ada inventaris yang ditemukan.</td>
-            </tr>
-        @endforelse
-    </tbody>
-</table>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button onclick="document.getElementById('importModal').classList.add('hidden')" class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
+                        Batal
+                    </button>
                 </div>
             </div>
         </div>
