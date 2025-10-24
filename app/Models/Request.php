@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Request extends Model
 {
     protected $fillable = [
-        'item_id',
+        'inventaris_id',
         'jumlah',
         'tanggal_request',
         'status',
@@ -15,9 +15,9 @@ class Request extends Model
         'approver_id',
     ];
 
-    public function item()
+    public function inventaris()
     {
-        return $this->belongsTo(Inventaris::class, 'item_id', 'id');
+        return $this->belongsTo(Inventaris::class);
     }
 
     public function requester()

@@ -34,8 +34,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('transactions', TransactionController::class)->except(['edit', 'update']);
     Route::resource('requests', RequestController::class);
 
-    // API route for fetching inventaris stock
-    Route::get('api/inventaris/{inventaris}/stock', [InventarisController::class, 'getStock'])->name('api.inventaris.stock');
 
 
     // Report Routes

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class StokHabisPakai extends Model
 {
     protected $fillable = [
-        'id_inventaris',
+        'inventaris_id',
         'jumlah_masuk',
         'jumlah_keluar',
         'tanggal',
@@ -16,6 +16,6 @@ class StokHabisPakai extends Model
     // Relationships
     public function inventaris()
     {
-        return $this->belongsTo(Inventaris::class, 'id_inventaris', 'id');
+        return $this->belongsTo(Inventaris::class);
     }
 }

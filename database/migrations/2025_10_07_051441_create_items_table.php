@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama_barang');
             $table->enum('kategori', ['habis_pakai', 'tidak_habis_pakai', 'aset_tetap']);
-            $table->integer('stok');
+            $table->integer('stok')->default(0);
             $table->string('kondisi')->nullable(); // e.g., "Baik", "Rusak Ringan", "Rusak Berat"
             $table->foreignId('room_id')->constrained()->onDelete('cascade');
             $table->foreignId('unit_id')->nullable()->constrained('units')->onDelete('set null');

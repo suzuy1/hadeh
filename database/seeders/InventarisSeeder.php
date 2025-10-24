@@ -2,81 +2,89 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Inventaris; // Import model
+use App\Models\StokHabisPakai; // Import model
 
 class InventarisSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        \App\Models\Inventaris::create([
-            'kode_inventaris' => 'AT/FT/DANA-A/2023/01/001',
+        $inventaris1 = Inventaris::create([
+            // 'kode_inventaris' => Dihapus, dihandle Observer
             'nama_barang' => 'Pulpen Standard',
-            'kategori' => 'AT',
+            'kategori' => 'habis_pakai', // Sesuaikan
             'pemilik' => 'FT',
             'sumber_dana' => 'DANA-A',
-            'tahun_beli' => 2023,
-            'kondisi' => 'Baik',
-            'lokasi' => 'Rak 1',
-            'room_id' => 1, // Laboratorium Komputer
-            'unit_id' => 1, // Fakultas Teknik
+            'tahun_beli' => '2023-01-15', // Format YYYY-MM-DD
             'nomor_unit' => 1,
+            'kondisi_baik' => 0, // Untuk habis pakai, jumlah ada di stok
+            'kondisi_rusak_ringan' => 0,
+            'kondisi_rusak_berat' => 0,
+            'lokasi' => 'Rak 1',
+            'room_id' => 1,
+            'unit_id' => 1,
         ]);
 
-        \App\Models\StokHabisPakai::create([
-            'id_inventaris' => 1,
+        StokHabisPakai::create([
+            'inventaris_id' => $inventaris1->id, // Gunakan ID dari inventaris yang baru dibuat
             'jumlah_masuk' => 100,
+            'jumlah_keluar' => 0,
             'tanggal' => now()->toDateString(),
         ]);
 
-        \App\Models\Inventaris::create([
-            'kode_inventaris' => 'EL/FE/DANA-B/2024/02/002',
+        Inventaris::create([
+            // 'kode_inventaris' => Dihapus, dihandle Observer
             'nama_barang' => 'Laptop Lenovo',
-            'kategori' => 'EL',
+            'kategori' => 'tidak_habis_pakai', // Sesuaikan
             'pemilik' => 'FE',
             'sumber_dana' => 'DANA-B',
-            'tahun_beli' => 2024,
-            'kondisi' => 'Baik',
-            'lokasi' => 'Meja 5',
-            'room_id' => 2, // Ruang Kuliah A
-            'unit_id' => 2, // Fakultas Ekonomi
+            'tahun_beli' => '2024-03-10', // Format YYYY-MM-DD
             'nomor_unit' => 2,
+            'kondisi_baik' => 1, // Jumlah kondisi
+            'kondisi_rusak_ringan' => 0,
+            'kondisi_rusak_berat' => 0,
+            'lokasi' => 'Meja 5',
+            'room_id' => 2,
+            'unit_id' => 2,
         ]);
 
-        \App\Models\Inventaris::create([
-            'kode_inventaris' => 'PK/LIB/DANA-C/2022/03/003',
+        Inventaris::create([
+            // 'kode_inventaris' => Dihapus, dihandle Observer
             'nama_barang' => 'Meja Kantor',
-            'kategori' => 'PK',
+            'kategori' => 'aset_tetap', // Sesuaikan
             'pemilik' => 'LIB',
             'sumber_dana' => 'DANA-C',
-            'tahun_beli' => 2022,
-            'kondisi' => 'Rusak Ringan',
-            'lokasi' => 'Area Baca',
-            'room_id' => 3, // Ruang Administrasi
-            'unit_id' => 3, // Perpustakaan
+            'tahun_beli' => '2022-11-20', // Format YYYY-MM-DD
             'nomor_unit' => 3,
+            'kondisi_baik' => 0, // Jumlah kondisi
+            'kondisi_rusak_ringan' => 1,
+            'kondisi_rusak_berat' => 0,
+            'lokasi' => 'Area Baca',
+            'room_id' => 3,
+            'unit_id' => 3,
         ]);
 
-        \App\Models\Inventaris::create([
-            'kode_inventaris' => 'AT/FT/DANA-A/2023/01/004',
+        $inventaris4 = Inventaris::create([
+            // 'kode_inventaris' => Dihapus, dihandle Observer
             'nama_barang' => 'Spidol Whiteboard',
-            'kategori' => 'AT',
+            'kategori' => 'habis_pakai', // Sesuaikan
             'pemilik' => 'FT',
             'sumber_dana' => 'DANA-A',
-            'tahun_beli' => 2023,
-            'kondisi' => 'Baik',
-            'lokasi' => 'Rak 1',
-            'room_id' => 1, // Laboratorium Komputer
-            'unit_id' => 1, // Fakultas Teknik
+            'tahun_beli' => '2023-01-15', // Format YYYY-MM-DD
             'nomor_unit' => 4,
+            'kondisi_baik' => 0,
+            'kondisi_rusak_ringan' => 0,
+            'kondisi_rusak_berat' => 0,
+            'lokasi' => 'Rak 1',
+            'room_id' => 1,
+            'unit_id' => 1,
         ]);
 
-        \App\Models\StokHabisPakai::create([
-            'id_inventaris' => 4,
+        StokHabisPakai::create([
+            'inventaris_id' => $inventaris4->id, // Gunakan ID dari inventaris yang baru dibuat
             'jumlah_masuk' => 50,
+             'jumlah_keluar' => 0,
             'tanggal' => now()->toDateString(),
         ]);
     }

@@ -5,54 +5,33 @@
         <h1 class="text-3xl font-bold leading-tight text-gray-900 mb-8">Tambah Transaksi Baru</h1>
 
         <div class="bg-white shadow-md rounded-lg p-6">
-            <form action="{{ route('transactions.store') }}" method="POST" x-data="{
-                selectedInventarisId: '{{ old('item_id') }}',
-                inventarisData: {{ $inventaris->toJson() }},
-                currentStock: 0,
-                itemType: '',
-                updateStockInfo() {
-                    const selectedItem = this.inventarisData.find(item => item.id == this.selectedInventarisId);
-                    if (selectedItem) {
-                        this.itemType = selectedItem.kategori;
-                        if (this.itemType === 'habis_pakai') {
-                            // Fetch current stock for consumable item
-                            fetch(`/api/inventaris/${selectedItem.id}/stock`)
-                                .then(response => response.json())
-                                .then(data => {
-                                    this.currentStock = data.sisa_stok;
-                                })
-                                .catch(error => {
-                                    console.error('Error fetching stock:', error);
-                                    this.currentStock = 'N/A';
-                                });
-                        } else {
-                            this.currentStock = 'Tidak Berlaku';
-                        }
-                    } else {
-                        this.currentStock = 0;
-                        this.itemType = '';
-                    }
-                }
-            }" x-init="updateStockInfo()">
+            <form action="{{ route('transactions.store') }}" method="POST" x-data="stockChecker({{ $inventaris->toJson() }})" x-init="init()">
                 @csrf
 
                 <div class="mb-4">
-                    <label for="item_id" class="block text-gray-700 text-sm font-bold mb-2">Inventaris:</label>
-                    <select name="item_id" id="item_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('item_id') border-red-500 @enderror" x-model="selectedInventarisId" @change="updateStockInfo()" required>
+                    <label for="inventaris_id" class="block text-gray-700 text-sm font-bold mb-2">Inventaris:</label>
+                    <select name="inventaris_id" id="inventaris_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('inventaris_id') border-red-500 @enderror" x-model="selectedInventarisId" @change="updateStockInfo()" required>
                         <option value="">Pilih Inventaris</option>
                         @foreach ($inventaris as $item)
-                            <option value="{{ $item->id }}" {{ old('item_id') == $item->id ? 'selected' : '' }}>
+                            <option value="{{ $item->id }}" {{ old('inventaris_id') == $item->id ? 'selected' : '' }}>
                                 {{ $item->nama_barang }} ({{ $item->kode_inventaris }}) - {{ $item->kategori ?? 'N/A' }}
                             </option>
                         @endforeach
                     </select>
-                    @error('item_id')
+                    @error('inventaris_id')
                         <p class="text-red-500 text-xs italic">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div class="mb-4" x-show="itemType === 'habis_pakai'">
-                    <p class="text-gray-700 text-sm font-bold mb-2">Stok Tersedia (Habis Pakai): <span x-text="currentStock" class="font-normal"></span></p>
+                     <p class="text-gray-700 text-sm font-bold mb-2">Stok Tersedia (Habis Pakai):
+                          <span x-text="currentStock" class="font-normal"></span>
+                     </p>
+                </div>
+                 <div class="mb-4" x-show="itemType === 'tidak_habis_pakai' || itemType === 'aset_tetap'">
+                     <p class="text-gray-700 text-sm font-bold mb-2">Jumlah Kondisi Baik:
+                          <span x-text="currentStock" class="font-normal"></span>
+                     </p>
                 </div>
 
                 <div class="mb-4">

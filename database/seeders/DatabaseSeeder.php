@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserSeeder::class,
-            JenisBarangSeeder::class,
+            // JenisBarangSeeder::class, // Hapus atau komentari baris ini
             UnitSeeder::class,
             RoomSeeder::class,
             InventarisSeeder::class,

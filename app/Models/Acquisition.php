@@ -9,7 +9,7 @@ use App\Models\User;
 class Acquisition extends Model
 {
     protected $fillable = [
-        'item_id',
+        'inventaris_id',
         'quantity',
         'acquisition_date',
         'source',
@@ -18,7 +18,7 @@ class Acquisition extends Model
         'user_id',
     ];
 
-    public function item()
+    public function inventaris()
     {
         return $this->belongsTo(Inventaris::class);
     }

@@ -37,7 +37,7 @@ class TransactionController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'item_id' => 'required|exists:inventaris,id',
+            'inventaris_id' => 'required|exists:inventaris,id',
             'jenis' => 'required|in:penggunaan,peminjaman,pengembalian,mutasi',
             'jumlah' => 'required|integer|min:1',
             'tanggal' => 'required|date',
@@ -45,40 +45,49 @@ class TransactionController extends Controller
             'keterangan' => 'nullable|string|max:255',
         ]);
 
-        $inventaris = Inventaris::findOrFail($validatedData['item_id']);
+        $inventaris = Inventaris::findOrFail($validatedData['inventaris_id']);
 
-        DB::transaction(function () use ($validatedData, $inventaris) {
-            if ($inventaris->kategori === 'habis_pakai') {
-                // For consumable items, update stok_habis_pakai
-                if ($validatedData['jenis'] === 'penggunaan' || $validatedData['jenis'] === 'peminjaman') {
-                    $currentStock = StokHabisPakai::where('id_inventaris', $inventaris->id)->sum(DB::raw('jumlah_masuk - jumlah_keluar'));
-                    if ($currentStock < $validatedData['jumlah']) {
-                        throw new \Exception('Stok barang habis pakai tidak mencukupi.');
+        try {
+            DB::transaction(function () use ($validatedData, $inventaris) {
+                if ($inventaris->kategori === 'habis_pakai') {
+                    if ($validatedData['jenis'] === 'penggunaan' || $validatedData['jenis'] === 'peminjaman') {
+                        $currentStock = StokHabisPakai::where('inventaris_id', $inventaris->id)->sum(DB::raw('jumlah_masuk - jumlah_keluar'));
+                        if ($currentStock < $validatedData['jumlah']) {
+                            throw \Illuminate\Validation\ValidationException::withMessages([
+                                'jumlah' => 'Stok barang habis pakai tidak mencukupi (tersedia: ' . $currentStock . ').',
+                            ]);
+                        }
+                        StokHabisPakai::create([
+                            'inventaris_id' => $inventaris->id,
+                            'jumlah_masuk' => 0,
+                            'jumlah_keluar' => $validatedData['jumlah'],
+                            'tanggal' => $validatedData['tanggal'],
+                        ]);
+                    } elseif ($validatedData['jenis'] === 'pengembalian') {
+                        StokHabisPakai::create([
+                            'inventaris_id' => $inventaris->id,
+                            'jumlah_masuk' => $validatedData['jumlah'],
+                            'jumlah_keluar' => 0,
+                            'tanggal' => $validatedData['tanggal'],
+                        ]);
                     }
-                    StokHabisPakai::create([
-                        'id_inventaris' => $inventaris->id,
-                        'jumlah_masuk' => 0,
-                        'jumlah_keluar' => $validatedData['jumlah'],
-                        'tanggal' => $validatedData['tanggal'],
-                    ]);
-                } elseif ($validatedData['jenis'] === 'pengembalian') {
-                    StokHabisPakai::create([
-                        'id_inventaris' => $inventaris->id,
-                        'jumlah_masuk' => $validatedData['jumlah'],
-                        'jumlah_keluar' => 0,
-                        'tanggal' => $validatedData['tanggal'],
-                    ]);
                 }
-            } else {
-                // For non-consumable items, stock is not managed by quantity in stok_habis_pakai
-            }
-
-            Transaction::create($validatedData);
-        });
-
-
-        return redirect()->route('transactions.index')
-            ->with('success', 'Transaction created successfully.');
+                Transaction::create([
+                    'inventaris_id' => $validatedData['inventaris_id'],
+                    'jenis' => $validatedData['jenis'],
+                    'jumlah' => $validatedData['jumlah'],
+                    'tanggal' => $validatedData['tanggal'],
+                    'user_id' => $validatedData['user_id'],
+                    'keterangan' => $validatedData['keterangan'],
+                ]);
+            });
+            return redirect()->route('transactions.index')->with('success', 'Transaction created successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->withErrors($e->errors())->withInput();
+        } catch (\Exception $e) {
+            Log::error('Gagal membuat transaksi: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal membuat transaksi: ' . $e->getMessage())->withInput();
+        }
     }
 
     /**
@@ -96,20 +105,22 @@ class TransactionController extends Controller
     public function destroy(Transaction $transaction)
     {
         DB::transaction(function () use ($transaction) {
-            $inventaris = $transaction->item;
+            // Gunakan relasi inventaris()
+            $inventaris = $transaction->inventaris;
             if ($inventaris && $inventaris->kategori === 'habis_pakai') {
-                // Revert stock changes for consumable items
+                // ... (logika revert stok)
+                // Pastikan menggunakan $inventaris->id
                 if ($transaction->jenis === 'penggunaan' || $transaction->jenis === 'peminjaman') {
                     StokHabisPakai::create([
-                        'id_inventaris' => $inventaris->id,
+                        'inventaris_id' => $inventaris->id, // <-- Pastikan ini inventaris_id
                         'jumlah_masuk' => $transaction->jumlah,
                         'jumlah_keluar' => 0,
                         'tanggal' => now()->toDateString(),
                         'keterangan' => 'Revert from deleted transaction: ' . $transaction->id,
                     ]);
                 } elseif ($transaction->jenis === 'pengembalian') {
-                    StokHabisPakai::create([
-                        'id_inventaris' => $inventaris->id,
+                     StokHabisPakai::create([
+                        'inventaris_id' => $inventaris->id, // <-- Pastikan ini inventaris_id
                         'jumlah_masuk' => 0,
                         'jumlah_keluar' => $transaction->jumlah,
                         'tanggal' => now()->toDateString(),

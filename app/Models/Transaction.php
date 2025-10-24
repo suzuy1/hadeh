@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Transaction extends Model
 {
     protected $fillable = [
-        'item_id',
+        'inventaris_id',
         'jenis',
         'jumlah',
         'tanggal',
@@ -15,9 +15,9 @@ class Transaction extends Model
         'keterangan',
     ];
 
-    public function item()
+    public function inventaris()
     {
-        return $this->belongsTo(Inventaris::class, 'item_id', 'id');
+        return $this->belongsTo(Inventaris::class);
     }
 
     public function user()

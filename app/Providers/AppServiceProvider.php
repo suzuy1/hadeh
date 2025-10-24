@@ -4,6 +4,10 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade; // Add this line
+use App\Models\Inventaris;
+use App\Observers\InventarisObserver;
+use App\Policies\InventarisPolicy; // Tambahkan ini
+use Illuminate\Support\Facades\Gate; // Tambahkan ini
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,5 +31,8 @@ class AppServiceProvider extends ServiceProvider
         Blade::component('dropdown', 'components.dropdown');
         Blade::component('dropdown-link', 'components.dropdown-link');
         Blade::component('responsive-nav-link', 'components.responsive-nav-link');
+
+        Inventaris::observe(InventarisObserver::class);
+        Gate::policy(Inventaris::class, InventarisPolicy::class); // Daftarkan policy
     }
 }

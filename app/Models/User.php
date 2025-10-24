@@ -63,4 +63,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(Request::class, 'approver_id');
     }
+
+    // Tambahkan relasi ini
+    public function acquisitions()
+    {
+        // Asumsi foreign key di tabel acquisitions adalah user_id
+        return $this->hasMany(Acquisition::class);
+    }
 }
