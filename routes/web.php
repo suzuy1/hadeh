@@ -13,6 +13,7 @@ use App\Http\Controllers\RequestController; // Import the RequestController
 use App\Http\Controllers\ReportController; // Import the ReportController
 
 Route::get('/', [LoginController::class, 'index'])->name('login');
+Route::get('/login', [LoginController::class, 'index'])->name('login.get');
 Route::post('/login', [LoginController::class, 'store'])->name('login.post');
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

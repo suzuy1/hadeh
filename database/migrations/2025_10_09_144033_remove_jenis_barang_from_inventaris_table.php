@@ -12,10 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('inventaris', function (Blueprint $table) {
-            $table->dropForeign(['id_jenis']); // Drop the foreign key constraint
-            $table->dropColumn('id_jenis'); // Drop the column
+            if (Schema::hasColumn('inventaris', 'id_jenis')) {
+                $table->dropForeign(['id_jenis']); // Drop the foreign key constraint
+                $table->dropColumn('id_jenis'); // Drop the column
+            }
         });
-        Schema::dropIfExists('jenis_barangs'); // Drop the table
+        if (Schema::hasTable('jenis_barangs')) {
+            Schema::dropIfExists('jenis_barangs'); // Drop the table
+        }
     }
 
     /**

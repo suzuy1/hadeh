@@ -4,6 +4,15 @@
     <div class="max-w-7xl mx-auto">
         <h1 class="text-3xl font-bold leading-tight text-gray-900 mb-8">Tambah Inventaris Baru</h1>
 
+        {{-- TAMBAHKAN BLOK INI UNTUK MELIHAT ERROR --}}
+        @if(session('error'))
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                <strong class="font-bold">Error!</strong>
+                <span class="block sm:inline">{{ session('error') }}</span>
+            </div>
+        @endif
+        {{-- BATAS PENAMBAHAN KODE --}}
+
         <div class="bg-white shadow-md rounded-lg p-6">
             <form action="{{ route('inventaris.store') }}" method="POST" x-data="{ kategori: '{{ old('kategori', 'tidak_habis_pakai') }}' }">
                 @csrf

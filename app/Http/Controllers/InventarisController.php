@@ -11,6 +11,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\InventarisExport;
 use App\Imports\InventarisImport;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log; // Opsional, untuk debugging
 
 class InventarisController extends Controller // Changed class name
 {
@@ -44,7 +45,12 @@ class InventarisController extends Controller // Changed class name
      */
     public function create()
     {
-        // ... (kode di fungsi ini tidak perlu diubah)
+        // Ambil semua data unit dan ruangan
+        $units = \App\Models\Unit::all();
+        $rooms = \App\Models\Room::all();
+
+        // Kirim data ke view
+        return view('inventaris.create', compact('units', 'rooms'));
     }
 
     /**
@@ -52,7 +58,70 @@ class InventarisController extends Controller // Changed class name
      */
     public function store(Request $request)
     {
-        // ... (kode di fungsi ini tidak perlu diubah)
+        // 1. Validasi data
+        $validatedData = $request->validate([
+            'nama_barang' => 'required|string|max:255',
+            'kategori' => 'required|string|in:tidak_habis_pakai,habis_pakai,aset_tetap',
+            'pemilik' => 'required|string|max:255',
+            'sumber_dana' => 'required|string|max:255',
+            'tahun_beli' => 'required|date',
+            'nomor_unit' => 'required|integer|min:1',
+            'kondisi_baik' => 'required|integer|min:0',
+            'kondisi_rusak_ringan' => 'required|integer|min:0',
+            'kondisi_rusak_berat' => 'required|integer|min:0',
+            'keterangan' => 'nullable|string',
+            'lokasi' => 'nullable|string',
+            'unit_id' => 'required|exists:units,id',
+            'room_id' => 'required|exists:rooms,id',
+            'initial_stok' => 'nullable|integer|min:0|required_if:kategori,habis_pakai',
+        ]);
+
+        // 2. Mulai Transaksi Database
+        DB::beginTransaction();
+
+        try {
+            // 3. Buat entri Inventaris baru
+            $inventaris = Inventaris::create([
+                'nama_barang' => $validatedData['nama_barang'],
+                'kategori' => $validatedData['kategori'],
+                'pemilik' => $validatedData['pemilik'],
+                'sumber_dana' => $validatedData['sumber_dana'],
+                'tahun_beli' => $validatedData['tahun_beli'],
+                'nomor_unit' => $validatedData['nomor_unit'],
+                'kondisi_baik' => $validatedData['kondisi_baik'],
+                'kondisi_rusak_ringan' => $validatedData['kondisi_rusak_ringan'],
+                'kondisi_rusak_berat' => $validatedData['kondisi_rusak_berat'],
+                'keterangan' => $validatedData['keterangan'],
+                'lokasi' => $validatedData['lokasi'],
+                'unit_id' => $validatedData['unit_id'],
+                'room_id' => $validatedData['room_id'],
+                // kode_inventaris akan di-generate oleh Observer (InventarisObserver)
+            ]);
+
+            // 4. Jika barang habis pakai, buat entri stok
+            if ($validatedData['kategori'] === 'habis_pakai') {
+                StokHabisPakai::create([
+                    'inventaris_id' => $inventaris->id,
+                    'stok' => $validatedData['initial_stok'] ?? 0,
+                ]);
+            }
+
+            // 5. Commit transaksi
+            DB::commit();
+
+            // 6. Redirect ke halaman index dengan pesan sukses
+            return redirect()->route('inventaris.index')->with('success', 'Data inventaris berhasil ditambahkan.');
+
+        } catch (\Exception $e) {
+            // 7. Jika terjadi error, rollback transaksi
+            DB::rollBack();
+
+            // Opsional: Catat error untuk debugging
+            Log::error('Gagal menyimpan inventaris baru: ' . $e->getMessage());
+
+            // Redirect kembali ke form dengan pesan error
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan data. Silakan coba lagi.');
+        }
     }
 
     /**
