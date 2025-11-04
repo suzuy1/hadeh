@@ -16,9 +16,10 @@ class RequestController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $requests = ItemRequest::with(['item', 'requester', 'approver'])->get();
+        $this->authorize('viewAny', ItemRequest::class); // Proteksi
+        $requests = ItemRequest::with(['item', 'requester', 'approver'])->paginate(10); // Ganti .get()
         return view('requests.index', compact('requests'));
     }
 
@@ -27,6 +28,7 @@ class RequestController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', ItemRequest::class); // Proteksi
         $inventaris = Inventaris::all();
         return view('requests.create', compact('inventaris'));
     }
@@ -36,23 +38,24 @@ class RequestController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', ItemRequest::class); // Proteksi
         $validatedData = $request->validate([
-            'item_id' => 'required|exists:inventaris,id',
+            'inventaris_id' => 'required|exists:inventaris,id', // Ganti item_id ke inventaris_id
             'jumlah' => 'required|integer|min:1',
             'tanggal_request' => 'required|date',
         ]);
 
-        $inventaris = Inventaris::findOrFail($validatedData['item_id']);
+        $inventaris = Inventaris::findOrFail($validatedData['inventaris_id']); // Ganti item_id ke inventaris_id
 
         if ($inventaris->kategori === 'habis_pakai') {
-            $currentStock = StokHabisPakai::where('id_inventaris', $inventaris->id)->sum(DB::raw('jumlah_masuk - jumlah_keluar'));
+            $currentStock = StokHabisPakai::where('inventaris_id', $inventaris->id)->sum(DB::raw('jumlah_masuk - jumlah_keluar')); // Ganti id_inventaris ke inventaris_id
             if ($currentStock < $validatedData['jumlah']) {
                 return back()->withErrors(['jumlah' => 'Stok barang habis pakai tidak mencukupi untuk permintaan ini.'])->withInput();
             }
         }
 
         ItemRequest::create([
-            'item_id' => $validatedData['item_id'],
+            'inventaris_id' => $validatedData['inventaris_id'], // Ganti item_id ke inventaris_id
             'jumlah' => $validatedData['jumlah'],
             'tanggal_request' => $validatedData['tanggal_request'],
             'requester_id' => Auth::id(),
@@ -68,6 +71,7 @@ class RequestController extends Controller
      */
     public function show(ItemRequest $request)
     {
+        $this->authorize('view', $request); // Proteksi
         $request->load(['item', 'requester', 'approver']);
         return view('requests.show', compact('request'));
     }
@@ -77,6 +81,7 @@ class RequestController extends Controller
      */
     public function edit(ItemRequest $request)
     {
+        $this->authorize('update', $request); // Proteksi
         $users = User::all();
         $inventaris = Inventaris::all();
         return view('requests.edit', compact('request', 'users', 'inventaris'));
@@ -87,6 +92,7 @@ class RequestController extends Controller
      */
     public function update(Request $request, ItemRequest $requestModel)
     {
+        $this->authorize('update', $requestModel); // Proteksi
         $validatedData = $request->validate([
             'status' => 'required|in:pending,disetujui,ditolak',
             'approver_id' => 'nullable|exists:users,id',
@@ -102,13 +108,13 @@ class RequestController extends Controller
 
             if ($validatedData['status'] === 'disetujui') {
                 if ($inventaris->kategori === 'habis_pakai') {
-                    $currentStock = StokHabisPakai::where('id_inventaris', $inventaris->id)->sum(DB::raw('jumlah_masuk - jumlah_keluar'));
+                    $currentStock = StokHabisPakai::where('inventaris_id', $inventaris->id)->sum(DB::raw('jumlah_masuk - jumlah_keluar')); // Ganti id_inventaris ke inventaris_id
                     if ($currentStock < $requestModel->jumlah) {
                         throw new \Exception('Stok barang habis pakai tidak mencukupi untuk menyetujui permintaan ini.');
                     }
 
                     StokHabisPakai::create([
-                        'id_inventaris' => $inventaris->id,
+                        'inventaris_id' => $inventaris->id, // Ganti id_inventaris ke inventaris_id
                         'jumlah_masuk' => 0,
                         'jumlah_keluar' => $requestModel->jumlah,
                         'tanggal' => now()->toDateString(),
@@ -116,7 +122,7 @@ class RequestController extends Controller
                 }
 
                 Transaction::create([
-                    'item_id' => $requestModel->item_id,
+                    'inventaris_id' => $requestModel->inventaris_id, // Ganti item_id ke inventaris_id
                     'jenis' => 'penggunaan',
                     'jumlah' => $requestModel->jumlah,
                     'tanggal' => now()->toDateString(),
@@ -135,6 +141,7 @@ class RequestController extends Controller
      */
     public function destroy(ItemRequest $request)
     {
+        $this->authorize('delete', $request); // Proteksi
         $request->delete();
 
         return redirect()->route('requests.index')

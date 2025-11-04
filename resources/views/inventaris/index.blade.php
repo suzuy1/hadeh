@@ -64,9 +64,10 @@
                     </div>
                 </div>
             </div>
-             <div class="mt-4">
-                {{ $inventaris->links() }}
             </div>
+        </div>
+        <div class="mt-4">
+            {{ $inventaris->links() }}
         </div>
     </div>
 

@@ -13,7 +13,7 @@ class Room extends Model
         'unit_id',
     ];
 
-    public function items()
+    public function inventaris()
     {
         return $this->hasMany(Inventaris::class);
     }

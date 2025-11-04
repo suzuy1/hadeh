@@ -15,9 +15,10 @@ class TransactionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $transactions = Transaction::with('user')->get();
+        $this->authorize('viewAny', Transaction::class); // Proteksi
+        $transactions = Transaction::with('user')->paginate(10); // Ganti .get()
         return view('transactions.index', compact('transactions'));
     }
 
@@ -26,6 +27,7 @@ class TransactionController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Transaction::class); // Proteksi
         $inventaris = Inventaris::all();
         $users = User::all();
         return view('transactions.create', compact('inventaris', 'users'));
@@ -36,6 +38,7 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Transaction::class); // Proteksi
         $validatedData = $request->validate([
             'inventaris_id' => 'required|exists:inventaris,id',
             'jenis' => 'required|in:penggunaan,peminjaman,pengembalian,mutasi',
@@ -95,6 +98,7 @@ class TransactionController extends Controller
      */
     public function show(Transaction $transaction)
     {
+        $this->authorize('view', $transaction); // Proteksi
         $transaction->load('user');
         return view('transactions.show', compact('transaction'));
     }
@@ -104,6 +108,7 @@ class TransactionController extends Controller
      */
     public function destroy(Transaction $transaction)
     {
+        $this->authorize('delete', $transaction); // Proteksi
         DB::transaction(function () use ($transaction) {
             // Gunakan relasi inventaris()
             $inventaris = $transaction->inventaris;

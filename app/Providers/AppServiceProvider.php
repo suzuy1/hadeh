@@ -5,8 +5,20 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade; // Add this line
 use App\Models\Inventaris;
+use App\Models\Room;        // Tambahkan
+use App\Models\Unit;        // Tambahkan
+use App\Models\User;        // Tambahkan
+use App\Models\Transaction; // Tambahkan
+use App\Models\Request;     // Tambahkan
+use App\Models\Acquisition; // Tambahkan
 use App\Observers\InventarisObserver;
 use App\Policies\InventarisPolicy; // Tambahkan ini
+use App\Policies\RoomPolicy;        // Tambahkan
+use App\Policies\UnitPolicy;        // Tambahkan
+use App\Policies\UserPolicy;        // Tambahkan
+use App\Policies\TransactionPolicy; // Tambahkan
+use App\Policies\RequestPolicy;     // Tambahkan
+use App\Policies\AcquisitionPolicy; // Tambahkan
 use Illuminate\Support\Facades\Gate; // Tambahkan ini
 
 class AppServiceProvider extends ServiceProvider
@@ -34,5 +46,11 @@ class AppServiceProvider extends ServiceProvider
 
         Inventaris::observe(InventarisObserver::class);
         Gate::policy(Inventaris::class, InventarisPolicy::class); // Daftarkan policy
+        Gate::policy(Room::class, RoomPolicy::class);
+        Gate::policy(Unit::class, UnitPolicy::class);
+        Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(Transaction::class, TransactionPolicy::class);
+        Gate::policy(Request::class, RequestPolicy::class);
+        Gate::policy(Acquisition::class, AcquisitionPolicy::class);
     }
 }

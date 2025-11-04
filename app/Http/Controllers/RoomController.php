@@ -11,9 +11,10 @@ class RoomController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request) // Tambahkan Request $request
     {
-        $rooms = Room::with('unit')->get(); // Eager load the unit relationship
+        $this->authorize('viewAny', Room::class); // Proteksi
+        $rooms = Room::with('unit')->paginate(10); // Langsung perbaiki paginasi
         return view('rooms.index', compact('rooms'));
     }
 
@@ -22,7 +23,8 @@ class RoomController extends Controller
      */
     public function create()
     {
-        $units = Unit::all(); // Get all units
+        $this->authorize('create', Room::class); // Proteksi
+        $units = Unit::all();
         return view('rooms.create', compact('units'));
     }
 
@@ -31,15 +33,13 @@ class RoomController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'nama_ruangan' => 'required|max:255',
-            'lokasi' => 'nullable|max:255',
-            'unit_id' => 'nullable|exists:units,id',
+        $this->authorize('create', Room::class); // Proteksi
+        $request->validate([
+            'nama_ruangan' => 'required|string|max:255',
+            'unit_id' => 'required|exists:units,id',
         ]);
-
-        Room::create($validatedData);
-
-        return redirect()->route('rooms.index')->with('success', 'Room created successfully!');
+        Room::create($request->all());
+        return redirect()->route('rooms.index')->with('success', 'Room created successfully.');
     }
 
     /**
@@ -47,7 +47,7 @@ class RoomController extends Controller
      */
     public function show(Room $room)
     {
-        $room->load('unit'); // Eager load the unit relationship
+        $this->authorize('view', $room); // Proteksi
         return view('rooms.show', compact('room'));
     }
 
@@ -56,7 +56,8 @@ class RoomController extends Controller
      */
     public function edit(Room $room)
     {
-        $units = Unit::all(); // Get all units
+        $this->authorize('update', $room); // Proteksi
+        $units = Unit::all();
         return view('rooms.edit', compact('room', 'units'));
     }
 
@@ -65,15 +66,13 @@ class RoomController extends Controller
      */
     public function update(Request $request, Room $room)
     {
-        $validatedData = $request->validate([
-            'nama_ruangan' => 'required|max:255',
-            'lokasi' => 'nullable|max:255',
-            'unit_id' => 'nullable|exists:units,id',
+        $this->authorize('update', $room); // Proteksi
+        $request->validate([
+            'nama_ruangan' => 'required|string|max:255',
+            'unit_id' => 'required|exists:units,id',
         ]);
-
-        $room->update($validatedData);
-
-        return redirect()->route('rooms.index')->with('success', 'Room updated successfully!');
+        $room->update($request->all());
+        return redirect()->route('rooms.index')->with('success', 'Room updated successfully.');
     }
 
     /**
@@ -81,8 +80,8 @@ class RoomController extends Controller
      */
     public function destroy(Room $room)
     {
+        $this->authorize('delete', $room); // Proteksi
         $room->delete();
-
-        return redirect()->route('rooms.index')->with('success', 'Room deleted successfully!');
+        return redirect()->route('rooms.index')->with('success', 'Room deleted successfully.');
     }
 }

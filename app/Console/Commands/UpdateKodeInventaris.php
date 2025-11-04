@@ -35,7 +35,7 @@ class UpdateKodeInventaris extends Command
         foreach ($inventarisItems as $item) {
             // Buat kode baru sesuai format yang diinginkan
             $newKode = sprintf(
-                'inv/%s/%s/%s/%02d',
+                'inv/%s/%s/%s/%03d',
                 $item->pemilik,
                 $item->sumber_dana,
                 date('Y', strtotime($item->tahun_beli)),

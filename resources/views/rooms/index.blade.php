@@ -71,5 +71,8 @@
                 </div>
             </div>
         </div>
+        <div class="mt-4">
+            {{ $rooms->links() }}
+        </div>
     </div>
 @endsection

@@ -13,7 +13,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $this->authorize('viewAny', User::class); // Proteksi
+        $users = User::paginate(10); // Ganti .all()
         return view('users.index', compact('users'));
     }
 
@@ -22,6 +23,7 @@ class UserController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', User::class); // Proteksi
         return view('users.create');
     }
 
@@ -30,6 +32,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', User::class); // Proteksi
         $validatedData = $request->validate([
             'name' => 'required|max:255',
             'email' => 'required|email|unique:users',
@@ -48,6 +51,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
+        $this->authorize('view', $user); // Proteksi
         return view('users.show', compact('user'));
     }
 
@@ -56,6 +60,7 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        $this->authorize('update', $user); // Proteksi
         return view('users.edit', compact('user'));
     }
 
@@ -64,6 +69,7 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        $this->authorize('update', $user); // Proteksi
         $validatedData = $request->validate([
             'name' => 'required|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -86,6 +92,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        $this->authorize('delete', $user); // Proteksi
         $user->delete();
 
         return redirect()->route('users.index')->with('success', 'User deleted successfully!');

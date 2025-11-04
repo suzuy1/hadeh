@@ -12,7 +12,8 @@ class UnitController extends Controller
      */
     public function index()
     {
-        $units = Unit::all();
+        $this->authorize('viewAny', Unit::class); // Proteksi
+        $units = Unit::paginate(10); // Ganti .all()
         return view('units.index', compact('units'));
     }
 
@@ -21,6 +22,7 @@ class UnitController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Unit::class); // Proteksi
         return view('units.create');
     }
 
@@ -29,6 +31,7 @@ class UnitController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Unit::class); // Proteksi
         $request->validate([
             'nama_unit' => 'required|string|max:255|unique:units',
         ]);
@@ -44,6 +47,7 @@ class UnitController extends Controller
      */
     public function show(Unit $unit)
     {
+        $this->authorize('view', $unit); // Proteksi
         return view('units.show', compact('unit'));
     }
 
@@ -52,6 +56,7 @@ class UnitController extends Controller
      */
     public function edit(Unit $unit)
     {
+        $this->authorize('update', $unit); // Proteksi
         return view('units.edit', compact('unit'));
     }
 
@@ -60,6 +65,7 @@ class UnitController extends Controller
      */
     public function update(Request $request, Unit $unit)
     {
+        $this->authorize('update', $unit); // Proteksi
         $request->validate([
             'nama_unit' => 'required|string|max:255|unique:units,nama_unit,' . $unit->id,
         ]);
@@ -75,6 +81,7 @@ class UnitController extends Controller
      */
     public function destroy(Unit $unit)
     {
+        $this->authorize('delete', $unit); // Proteksi
         $unit->delete();
 
         return redirect()->route('units.index')

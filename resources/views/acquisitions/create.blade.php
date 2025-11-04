@@ -9,16 +9,15 @@
                 @csrf
 
                 <div class="mb-4">
-                    <label for="item_id" class="block text-gray-700 text-sm font-bold mb-2">Item:</label>
-                    <select name="item_id" id="item_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline @error('item_id') border-red-500 @enderror" required>
-                        <option value="">Select an Item</option>
-                        @foreach ($items as $item)
-                            <option value="{{ $item->id }}" {{ old('item_id') == $item->id ? 'selected' : '' }}>{{ $item->name }}</option>
+                    <label for="inventaris_id" class="block text-gray-700 text-sm font-bold mb-2">Inventaris:</label>
+                    <select name="inventaris_id" id="inventaris_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <option value="">Pilih Barang</option>
+                        @foreach($inventarisItems as $item) 
+                            <option value="{{ $item->id }}" {{ old('inventaris_id') == $item->id ? 'selected' : '' }}>
+                                {{ $item->nama_barang }} ({{ $item->kategori }})
+                            </option>
                         @endforeach
                     </select>
-                    @error('item_id')
-                        <p class="text-red-500 text-xs italic">{{ $message }}</p>
-                    @enderror
                 </div>
 
                 <div class="mb-4">
